@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tracemark-watermark-engine"
+version = "0.1.0"
+description = "Framework-independent forensic watermarking primitives for TraceMark"
+requires-python = ">=3.12"
+dependencies = [
+  "numpy>=2.0,<3",
+  "Pillow>=10.4,<13",
+  "reedsolo>=1.7,<2",
+]
+
+[project.optional-dependencies]
+forensics = ["opencv-python-headless>=4.10,<5"]
+provenance = ["c2pa-python>=0.20,<1"]
+test = ["pytest>=8.3,<9"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tracemark_watermark"]
+
+[tool.pytest.ini_options]
+testpaths = ["../../../tests/algorithm"]
+

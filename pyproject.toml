@@ -1,0 +1,34 @@
+[project]
+name = "tracemark-workspace"
+version = "0.1.0"
+requires-python = ">=3.12,<3.14"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+  "algorithm: watermark algorithm tests",
+  "backend: backend integration tests",
+  "security: security control tests",
+  "robustness: transformation benchmark tests",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+extend-exclude = ["alembic/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "ASYNC"]
+ignore = ["S101", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"apps/api/tracemark_api/dependencies.py" = ["B008"]
+"apps/api/tracemark_api/routes/*.py" = ["B008"]
+"packages/watermark_engine/src/tracemark_watermark/payload.py" = ["S311"]
+"tests/**/*.py" = ["S105", "S106"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+
