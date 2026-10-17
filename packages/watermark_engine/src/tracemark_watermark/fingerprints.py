@@ -103,4 +103,3 @@ def fingerprint(image: Image.Image) -> ImageFingerprint:
         width=image.width,
         height=image.height,
     )
-

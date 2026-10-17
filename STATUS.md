@@ -1,33 +1,41 @@
-# TraceMark Status
+# TraceMark status
 
-Updated: 2026-07-20
+Updated: 2026-10-17. Application validation results below were measured on 2026-10-05.
 
-## Implemented
+The application now uses direct native Python and static frontend hosting. Obsolete infrastructure, duplicate publication/history documents and unused launch/proxy helpers are removed. Core watermarking, private registry isolation and exports are retained.
 
-- Initialized the Git monorepo and froze the specification, threat model, decisions, security policy, limitations, evaluation method, and operating instructions.
-- Added React/Vite/TypeScript application pages for landing, identity, dashboard, protection, assets, distributions, verification, tracing, collections, scanner, laboratory, reports, jobs, settings, and methodology.
-- Added the FastAPI/SQLAlchemy/Alembic service with Argon2id accounts, opaque server-side sessions, CSRF protection, owner-scoped resources, upload validation, private object downloads, audit records, normalized error responses, and correlation IDs.
-- Added PostgreSQL, Redis, MinIO, worker, web, API, and Nginx container definitions, health gates, private buckets, non-root application containers, native PowerShell commands, setup, seed, demo, benchmark, and cleanup scripts.
-- Added the standalone authenticated payload, HKDF domain-separated keys, RS(58,38), LSB baseline, blind DWT-DCT-QIM robust engine, alpha preservation, visible compositor, image fingerprints, ORB/RANSAC adapter, quality metrics, and optional official C2PA adapter.
-- Added real ownership protection, separately tokenized distribution copies, exact/hash/watermark/provenance verification, deterministic classification precedence, HMAC-authenticated report snapshots, JSON/HTML/PDF reports, collections with individual and safe ZIP ingestion, deduplication/search/rescan/delete, controlled public URL fetching, and measured benchmark runs.
-- Added deterministic licence-safe fixtures, security/algorithm/backend tests, frontend component/accessibility tests, Playwright configuration, CI, user/deployment/algorithm/benchmark documentation, and architecture/data-flow diagrams.
+Native production-configured restart validation passed: SQLite mappings survived, old output/report links returned 404, the saved protected image still verified, new operations and both exports succeeded, and clearing removed metadata. Production Secure/HttpOnly cookie flags and disabled API docs were checked through an explicit loopback ingress harness.
 
-## Validation evidence
+Dependency audits, Bandit, pip consistency and compilation passed. A real Windows child-teardown failure was repaired with retained resources and closed admission until reaping. The final Make test run passed 50 Python / 9 frontend tests with 86.49% coverage. Both lint command families passed.
 
-- Ruff: all checked Python source passes.
-- mypy strict: 42 source files pass with no issues.
-- pytest: 27 passed; one upstream Starlette TestClient deprecation warning.
-- frontend TypeScript and ESLint: pass.
-- Vitest: 2 files / 6 tests pass, including accessibility assertions.
-- Vite production build: pass (2,262 modules); bundle-size optimization warning remains.
-- Quick benchmark: robust clean 2/2 and JPEG-85 2/2; LSB clean 2/2 and JPEG-85 0/2; both 0/2 after 75% resize; zero accepted negatives.
-- Real browser: passed login, session reload, image upload, robust protection, protected-output history/download visibility, ownership verification, distribution creation, quick benchmark chart, and report listing; no browser warnings/errors.
+The final direct-API production-build browser report passed 12/12 with no failures, retries or skipped tests at 1440/1366/768/390 px. It includes actual protection, downloaded-file reupload, private evidence, PDF/JSON exports, reset/clear/repeat, invalid/oversized/corrupt/unmarked/offline states, refresh/direct routes and automated accessibility/layout checks. Four current screenshots were refreshed and the mobile evidence layout inspected.
 
-## Release blockers and incomplete acceptance
+## Final direct-deployment gates
 
-- Docker Desktop is not installed, so `docker compose config/build/up/ps`, PostgreSQL/Redis/MinIO integration, container health, and container Playwright acceptance could not be executed.
-- The worker and queue boundaries are scaffolded, but the current API vertical slice performs processing synchronously. Queue-backed cancellation, quotas, hard timeouts, and isolated-worker acceptance remain release work.
-- The scanner enforces public DNS/peer validation, redirect and content bounds, but robots.txt enforcement and production-safe peer verification still require container integration validation.
-- Full transformation coverage, resize synchronization, browser cross-user demonstration, PDF visual rendering review, and the specification's complete ten-stage formal acceptance remain unfinished.
+| Check | Result |
+|---|---|
+| Make lint and PowerShell lint | PASS: Ruff lint/format, strict MyPy, ESLint, TypeScript and Prettier |
+| Make tests | PASS: 50 Python / 9 frontend; 86.49% coverage |
+| PowerShell tests | PASS: 50 Python / 9 frontend; 86.38% coverage |
+| Make and PowerShell benchmark | PASS: real robust/LSB operations; strict JSON snapshot in docs/benchmark-quick.json |
+| Make and PowerShell restart | PASS: actual production-configured Uvicorn processes, retained SQLite mapping, expired artifacts, resumed/new operations, exports and clear |
+| Production-build browser suite | PASS: 12/12; no failures, retries or skips; automated axe and four viewports |
+| Default / HTTPS API frontend builds | PASS: JS 296.27 / 296.30 kB, gzip 93.03 / 93.05 kB; CSS 13.40 kB, gzip 3.60 kB |
+| Runtime/frontend audits and security | PASS: pip-audit and pnpm audit found no known vulnerabilities; Bandit, pip check and compilation passed |
+| Setup and package installation | PASS: setup.ps1 with existing local cache, locked pnpm install, both production wheels built and installed |
+| Local startup | PASS: native API readiness, Vite Protect/Verify routes and development API proxy |
+| Publication scan | PASS: no obsolete deployment references, development-tool attribution or private/generated publication candidates; four current screenshots |
 
-TraceMark is a functional, tested native-development implementation, but it is not marked production-complete while these gates remain open.
+Quick benchmark: robust clean 2/2, JPEG-85 2/2, resize-75 0/2; LSB clean 2/2, JPEG-85 0/2, resize-75 0/2. Each engine detected 0/2 unmarked controls. Two synthetic fixtures do not establish general robustness or a population false-positive rate.
+
+The HTTPS-configured build embeds its public API prefix and no configured backend secret. A routing dependency contains a localhost parsing fallback; it is not the application's configured API endpoint.
+
+Accessible generated reports, builds, caches and obsolete infrastructure directories were removed. Windows permission-protected remnants remain under three ignored test-cache trees; ownership recovery was denied by the OS. They are absent from Git publication candidates and are not runtime dependencies. Full local cache deletion requires an account able to repair those ACLs. Dependencies, local secrets and private application metadata were preserved.
+
+An upstream Starlette TestClient/httpx deprecation warning remains. Automated accessibility checks and local ingress simulation do not certify a live provider's HTTPS, cookie/CORS, resource limits or persistent mount. These require deployment-time smoke checks; one worker/instance and same-site HTTPS domains are the reference model.
+
+Verdict: **GO — READY FOR GITHUB AND DIRECT DEPLOYMENT**, with the documented operational and watermark limitations. No commits, tags, pushes or public deployments were made during the validation pass.
+
+## GitHub publication — 2026-10-17
+
+The owner authorized publication to [mosaddiqurr/TraceMark](https://github.com/mosaddiqurr/TraceMark). The destination was confirmed empty. Current publication candidates and existing local history were checked for private files and credential patterns; no findings were detected. Source publication is in progress. The live demo remains a placeholder; application hosting is a separate deployment step.

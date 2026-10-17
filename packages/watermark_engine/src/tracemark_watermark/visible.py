@@ -90,4 +90,3 @@ def add_visible_logo(
     if original_alpha is not None:
         base.putalpha(original_alpha)
     return base if "A" in image.getbands() else base.convert("RGB")
-

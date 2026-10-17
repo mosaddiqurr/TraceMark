@@ -7,13 +7,16 @@ from fastapi import HTTPException
 from tracemark_api.safe_fetch import validate_public_url
 
 
-@pytest.mark.parametrize("url", [
-    "file:///etc/passwd",
-    "http://127.0.0.1/image.png",
-    "http://169.254.169.254/latest/meta-data",
-    "http://[::1]/image.png",
-    "http://user:pass@example.com/image.png",
-])
+@pytest.mark.parametrize(
+    "url",
+    [
+        "file:///etc/passwd",
+        "http://127.0.0.1/image.png",
+        "http://169.254.169.254/latest/meta-data",
+        "http://[::1]/image.png",
+        "http://user:pass@example.com/image.png",
+    ],
+)
 def test_url_validator_rejects_unsafe_targets(url: str) -> None:
     with pytest.raises(HTTPException):
         validate_public_url(url)

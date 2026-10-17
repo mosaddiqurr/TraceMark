@@ -33,7 +33,7 @@ class ValidatedImage:
 def safe_display_name(filename: str | None) -> str:
     name = (filename or "image").replace("\\", "/").split("/")[-1]
     name = _SAFE_FILENAME.sub("_", name).strip(" .")
-    return (name[:255] or "image")
+    return name[:255] or "image"
 
 
 def sniff_image_format(content: bytes) -> str | None:
@@ -53,6 +53,7 @@ def validate_image(
     *,
     max_bytes: int,
     max_pixels: int,
+    max_dimension: int = 8192,
 ) -> ValidatedImage:
     if not content or len(content) > max_bytes:
         raise UploadRejected("image is empty or exceeds the byte limit")
@@ -62,8 +63,6 @@ def validate_image(
     expected_mime, extension = SUPPORTED_FORMATS[sniffed]
     if declared_content_type and declared_content_type.lower() not in {expected_mime, "application/octet-stream"}:
         raise UploadRejected("declared content type does not match image bytes")
-    previous_limit = Image.MAX_IMAGE_PIXELS
-    Image.MAX_IMAGE_PIXELS = max_pixels
     try:
         with Image.open(BytesIO(content)) as image:
             if image.format != sniffed:
@@ -73,13 +72,13 @@ def validate_image(
             width, height = image.size
             if width <= 0 or height <= 0 or width * height > max_pixels:
                 raise UploadRejected("image exceeds the decoded pixel limit")
+            if max(width, height) > max_dimension:
+                raise UploadRejected("image exceeds the dimension limit")
             image.verify()
         with Image.open(BytesIO(content)) as image:
             image.load()
     except (UnidentifiedImageError, OSError, Image.DecompressionBombError, Image.DecompressionBombWarning) as exc:
         raise UploadRejected("image could not be decoded safely") from exc
-    finally:
-        Image.MAX_IMAGE_PIXELS = previous_limit
     return ValidatedImage(
         content=content,
         display_name=safe_display_name(filename),
@@ -136,4 +135,3 @@ def validated_zip_images(
             if sniff_image_format(data):
                 result.append((safe_display_name(path.name), data))
     return result
-

@@ -1,19 +1,50 @@
 import { expect, test } from "@playwright/test";
+import { resolve } from "node:path";
+import { checkAccessibility } from "./accessibility";
 
-test.beforeEach(async ({ page }) => {
-  await page.route("**/api/v1/auth/session", (route) => route.fulfill({ status: 401, contentType: "application/json", body: JSON.stringify({ code: "unauthenticated", message: "Authentication required" }) }));
-});
-
-test("public introduction explains the product without unsupported claims", async ({ page }) => {
+test("four focused pages stay aligned at the configured viewport", async ({
+  page,
+}, testInfo) => {
+  for (const path of ["/", "/protect", "/verify", "/about"]) {
+    await page.goto(path);
+    await expect(
+      page.getByRole("navigation", { name: "Main navigation" }),
+    ).toBeVisible();
+    await expect(page.locator("h1")).toBeVisible();
+    await checkAccessibility(page);
+    await expect(page).toHaveTitle(/TraceMark$/);
+    for (const asset of [
+      "/brand/tracemark-logo.png",
+      "/brand/favicon.ico",
+      "/brand/apple-touch-icon.png",
+    ]) {
+      const response = await page.request.get(asset);
+      expect(response.ok()).toBe(true);
+      expect(response.headers()["content-type"]).toMatch(/^image\//);
+    }
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth > innerWidth,
+      ),
+    ).toBe(false);
+    const box = await page.locator("main").boundingBox();
+    expect(box).not.toBeNull();
+    expect(
+      Math.abs(box!.x * 2 + box!.width - testInfo.project.use.viewport!.width),
+    ).toBeLessThan(2);
+    if (testInfo.project.name === "desktop-1440" && path === "/") {
+      await page.screenshot({
+        path: resolve("../../docs/screenshots/desktop-1440-home.png"),
+        fullPage: true,
+      });
+    }
+  }
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /leave a mark/i })).toBeVisible();
-  await expect(page.getByText(/evidence—not legal proof/i)).toBeVisible();
-  await page.getByRole("link", { name: /sign in/i }).click();
-  await expect(page.getByRole("heading", { name: /sign in to tracemark/i })).toBeVisible();
-});
-
-test("mobile landing page exposes the primary account action", async ({ page }, testInfo) => {
-  test.skip(!testInfo.project.name.includes("mobile"), "Mobile-only assertion");
-  await page.goto("/");
-  await expect(page.getByRole("link", { name: /create workspace/i })).toBeVisible();
+  await page.keyboard.press("Tab");
+  await expect(
+    page.getByRole("link", { name: "Skip to content" }),
+  ).toBeFocused();
+  await expect(
+    page.getByRole("link", { name: "Use sample image" }),
+  ).toBeVisible();
 });

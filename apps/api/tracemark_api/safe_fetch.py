@@ -15,10 +15,16 @@ from fastapi import HTTPException
 
 def _public_address(value: str) -> ipaddress.IPv4Address | ipaddress.IPv6Address:
     address = ipaddress.ip_address(value)
-    if not address.is_global or any((
-        address.is_private, address.is_loopback, address.is_link_local,
-        address.is_multicast, address.is_reserved, address.is_unspecified,
-    )):
+    if not address.is_global or any(
+        (
+            address.is_private,
+            address.is_loopback,
+            address.is_link_local,
+            address.is_multicast,
+            address.is_reserved,
+            address.is_unspecified,
+        )
+    ):
         raise HTTPException(status_code=422, detail="URL resolves to a non-public network")
     return address
 
@@ -33,7 +39,8 @@ def validate_public_url(url: str) -> tuple[str, tuple[str, ...]]:
         raise HTTPException(status_code=422, detail="URL port is not permitted")
     try:
         records = socket.getaddrinfo(
-            parsed.hostname, parsed.port or (443 if parsed.scheme == "https" else 80),
+            parsed.hostname,
+            parsed.port or (443 if parsed.scheme == "https" else 80),
             type=socket.SOCK_STREAM,
         )
     except socket.gaierror as exc:
@@ -71,8 +78,12 @@ class _ImageParser(HTMLParser):
 
 class SafeFetcher:
     def __init__(
-        self, *, timeout: float = 12.0, max_bytes: int = 10 * 1024 * 1024,
-        max_redirects: int = 3, max_candidates: int = 30,
+        self,
+        *,
+        timeout: float = 12.0,
+        max_bytes: int = 10 * 1024 * 1024,
+        max_redirects: int = 3,
+        max_candidates: int = 30,
     ) -> None:
         self.timeout = timeout
         self.max_bytes = max_bytes
@@ -103,7 +114,8 @@ class SafeFetcher:
                     "Accept: image/jpeg,image/png,image/webp,text/html;q=0.8\r\n"
                     "Connection: close\r\n\r\n"
                 )
-                assert connection is not None
+                if connection is None:
+                    raise OSError("connection was not established")
                 connection.sendall(request.encode("ascii"))
                 response = http.client.HTTPResponse(connection)
                 response.begin()

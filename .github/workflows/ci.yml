@@ -7,8 +7,12 @@ on:
 permissions:
   contents: read
 
+env:
+  OPENBLAS_NUM_THREADS: "1"
+  OMP_NUM_THREADS: "1"
+
 jobs:
-  python:
+  validation:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,15 +20,6 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: python -m pip install -e './packages/watermark_engine[test,forensics]' -e './apps/api[dev]'
-      - run: python -m ruff check apps packages workers tests scripts
-      - run: python -m pytest tests/algorithm tests/backend tests/security -q
-      - run: python -m compileall -q apps packages workers scripts
-
-  web:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
           version: 10.30.3
@@ -32,15 +27,25 @@ jobs:
         with:
           node-version: "24"
           cache: pnpm
+      - run: python -m pip install -r requirements.txt -e './packages/watermark_engine[test,forensics]' -e './apps/api[dev]'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --dir apps/web lint
-      - run: pnpm --dir apps/web typecheck
-      - run: pnpm --dir apps/web test
+      - run: make lint
+      - run: make test
+      - run: make benchmark
+      - run: make restart
       - run: pnpm --dir apps/web build
-
-  compose-config:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: cp .env.example .env
-      - run: docker compose config
+      - run: pnpm audit --audit-level moderate
+      - run: python -m pip_audit -r requirements.txt --no-deps --disable-pip
+      - run: python -m pip check
+      - run: python -m bandit -r apps/api/tracemark_api packages/watermark_engine/src scripts -q
+      - run: python -m compileall -q apps packages scripts
+      - run: pnpm --dir apps/web exec playwright install --with-deps chromium
+      - run: pnpm --dir apps/web e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: direct-browser-evidence
+          path: |
+            apps/web/playwright-report
+            docs/screenshots
+            artifacts/benchmark-results.json

@@ -1,0 +1,7 @@
+[build]
+  command = "pnpm --dir apps/web build"
+  publish = "apps/web/dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+  PNPM_VERSION = "10.30.3"

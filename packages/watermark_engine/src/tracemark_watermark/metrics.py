@@ -51,9 +51,7 @@ def _windowed_ssim(left: np.ndarray, right: np.ndarray, window: int = 8) -> floa
             variance_y = float(y.var())
             covariance = float(((x - mu_x) * (y - mu_y)).mean())
             numerator = (2.0 * mu_x * mu_y + c1) * (2.0 * covariance + c2)
-            denominator = (mu_x * mu_x + mu_y * mu_y + c1) * (
-                variance_x + variance_y + c2
-            )
+            denominator = (mu_x * mu_x + mu_y * mu_y + c1) * (variance_x + variance_y + c2)
             scores.append(numerator / denominator)
     return float(np.clip(np.mean(scores), -1.0, 1.0))
 
@@ -83,4 +81,3 @@ def difference_image(reference: Image.Image, candidate: Image.Image, *, amplify:
         return difference
     values = np.asarray(difference, dtype=np.uint16)
     return Image.fromarray(np.clip(values * amplify, 0, 255).astype(np.uint8), "RGB")
-

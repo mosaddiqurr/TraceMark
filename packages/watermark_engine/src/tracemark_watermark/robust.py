@@ -58,9 +58,7 @@ def _haar_forward(values: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarra
     )
 
 
-def _haar_inverse(
-    ll: np.ndarray, lh: np.ndarray, hl: np.ndarray, hh: np.ndarray
-) -> np.ndarray:
+def _haar_inverse(ll: np.ndarray, lh: np.ndarray, hl: np.ndarray, hh: np.ndarray) -> np.ndarray:
     result = np.empty((ll.shape[0] * 2, ll.shape[1] * 2), dtype=np.float64)
     result[0::2, 0::2] = (ll + lh + hl + hh) / 2.0
     result[0::2, 1::2] = (ll - lh + hl - hh) / 2.0
@@ -125,12 +123,7 @@ class RobustWatermarkEngine(WatermarkEngine):
     def _descriptors(image: Image.Image) -> list[tuple[int, int, int]]:
         band_height = (image.height // 2) // BLOCK_SIZE
         band_width = (image.width // 2) // BLOCK_SIZE
-        return [
-            (band, row, column)
-            for band in (0, 1)
-            for row in range(band_height)
-            for column in range(band_width)
-        ]
+        return [(band, row, column) for band in (0, 1) for row in range(band_height) for column in range(band_width)]
 
     def capacity(self, image: Image.Image) -> Capacity:
         available = len(self._descriptors(image))
@@ -147,9 +140,7 @@ class RobustWatermarkEngine(WatermarkEngine):
         key_version: int,
     ) -> list[list[_Location]]:
         descriptors = self._descriptors(image)
-        placement_key = derive_subkey(
-            master_key, "robust-placement", key_version=key_version
-        )
+        placement_key = derive_subkey(master_key, "robust-placement", key_version=key_version)
         geometry = image.width.to_bytes(4, "big") + image.height.to_bytes(4, "big")
         used: set[tuple[int, int, int]] = set()
         repetitions: list[list[_Location]] = []
@@ -207,14 +198,11 @@ class RobustWatermarkEngine(WatermarkEngine):
             )
             block[:] = _inverse_dct(coefficients)
 
-    def embed(
-        self, image: Image.Image, payload: WatermarkPayload, master_key: bytes
-    ) -> EmbedResult:
+    def embed(self, image: Image.Image, payload: WatermarkPayload, master_key: bytes) -> EmbedResult:
         capacity = self.capacity(image)
         if not capacity.fits:
             raise CapacityError(
-                f"image has {capacity.available_bits} eligible DWT blocks; "
-                f"{capacity.required_bits} are required"
+                f"image has {capacity.available_bits} eligible DWT blocks; {capacity.required_bits} are required"
             )
         if payload.algorithm_version != self.algorithm_version:
             raise ValueError("payload algorithm_version does not identify robust v2")
@@ -247,9 +235,7 @@ class RobustWatermarkEngine(WatermarkEngine):
             },
         )
 
-    def _read_locations(
-        self, bands: list[np.ndarray], locations: Iterable[_Location]
-    ) -> tuple[np.ndarray, np.ndarray]:
+    def _read_locations(self, bands: list[np.ndarray], locations: Iterable[_Location]) -> tuple[np.ndarray, np.ndarray]:
         bits: list[int] = []
         reliability: list[float] = []
         for location in locations:
@@ -336,10 +322,7 @@ class RobustWatermarkEngine(WatermarkEngine):
                 voted = ((signed * weights).sum(axis=0) >= 0.0).astype(np.uint8)
 
                 candidates = [("weighted_vote", voted)]
-                candidates.extend(
-                    (f"repetition:{index}", value)
-                    for index, value in enumerate(repeat_bits)
-                )
+                candidates.extend((f"repetition:{index}", value) for index, value in enumerate(repeat_bits))
                 for source, candidate_bits in candidates:
                     try:
                         decoded = decode_payload(
@@ -348,7 +331,11 @@ class RobustWatermarkEngine(WatermarkEngine):
                             key_version=key_version,
                         )
                     except PayloadError as exc:
-                        last_error = type(exc).__name__
+                        candidate_error = (
+                            "payload_hmac_invalid" if "HMAC validation failed" in str(exc) else type(exc).__name__
+                        )
+                        if candidate_error == "payload_hmac_invalid" or last_error != "payload_hmac_invalid":
+                            last_error = candidate_error
                         continue
                     if decoded.payload.algorithm_version != self.algorithm_version:
                         last_error = "algorithm_version_mismatch"
@@ -365,9 +352,7 @@ class RobustWatermarkEngine(WatermarkEngine):
                             pass
                         else:
                             repetitions_found += 1
-                    mean_reliability = tuple(
-                        float(value) for value in reliability_matrix.mean(axis=0)
-                    )
+                    mean_reliability = tuple(float(value) for value in reliability_matrix.mean(axis=0))
                     return ExtractionResult(
                         valid=True,
                         payload=decoded.payload,
@@ -391,4 +376,3 @@ class RobustWatermarkEngine(WatermarkEngine):
             candidate_transformations=tuple(attempted),
             diagnostics={"candidate_count": len(attempted)},
         )
-

@@ -20,5 +20,4 @@ Build and maintain TraceMark as an honest, secure still-image forensic watermark
 
 ## Required checks
 
-Use `make lint`, `make test`, `make benchmark`, and the PowerShell equivalents. Container completion additionally requires `docker compose up --build` and healthy services.
-
+Use `make lint`, `make test`, `make benchmark`, and the PowerShell equivalents. Direct deployment readiness also requires a production frontend build, real browser journeys and `make restart` against a native FastAPI process.

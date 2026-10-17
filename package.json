@@ -7,6 +7,17 @@
     "build": "pnpm --dir apps/web build",
     "lint": "pnpm --dir apps/web lint",
     "typecheck": "pnpm --dir apps/web typecheck",
-    "test": "pnpm --dir apps/web test"
+    "test": "pnpm --dir apps/web test",
+    "audit": "pnpm audit --audit-level moderate"
+  },
+  "pnpm": {
+    "overrides": {
+      "brace-expansion@<2.0.0": "1.1.21",
+      "brace-expansion@>=4.0.0 <5.0.12": "5.0.12",
+      "js-yaml@>=4.0.0 <4.3.2": "4.3.2",
+      "nanoid@<3.3.18": "3.3.18",
+      "postcss@<=8.5.22": "8.5.23",
+      "react-router@>=7.12.0 <7.18.2": "7.18.3"
+    }
   }
 }

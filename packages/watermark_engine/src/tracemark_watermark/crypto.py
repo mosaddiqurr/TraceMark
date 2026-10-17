@@ -38,9 +38,7 @@ def hkdf_sha256(
     previous = b""
     counter = 1
     while len(output) < length:
-        previous = hmac.new(
-            prk, previous + info + bytes((counter,)), hashlib.sha256
-        ).digest()
+        previous = hmac.new(prk, previous + info + bytes((counter,)), hashlib.sha256).digest()
         output.extend(previous)
         counter += 1
     return bytes(output[:length])
@@ -70,4 +68,3 @@ def deterministic_seed(key: bytes, context: bytes) -> int:
     """Return a stable 64-bit seed suitable for a local PRNG."""
 
     return int.from_bytes(hmac.new(key, context, hashlib.sha256).digest()[:8], "big")
-

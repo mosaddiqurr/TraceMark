@@ -1,8 +1,19 @@
-# Demo Guide
+# Real demonstration
 
-Run 'make demo', open 'http://localhost:8080', and use the demonstration credentials from the local '.env'.
+1. Home → **Use sample image**.
+2. Optionally enter a recipient/reference label.
+3. **Protect image** → inspect filename, dimensions, identifier and success.
+4. **Download protected image**; save the actual PNG.
+5. Navigate to **Verify** and select that saved file. Checks start automatically.
+6. Read **VERIFIED**, the matching identifier and private label, authenticity and exact hash.
+7. Expand detailed evidence for SHA-256, ECC, pHash and ORB/RANSAC measurements.
+8. Export PDF or JSON directly from the result.
+9. Re-upload the unprotected sample to observe NOT VERIFIED.
+10. Resize the protected image to 75% and verify; recovery can fail while visual evidence may remain.
+11. A second browser workspace must not see the private label or download/report artifacts.
 
-Complete the positive journey through the UI: upload a generated sample; create a robust protected output; download it; verify it and confirm the ownership token; create a recipient-labelled distribution copy; download and verify it; confirm only that it corresponds to that distribution record; index generated transformed samples in a collection; search for visual derivatives; scan the bundled demonstration page; run the standard robustness profile; inspect charts and failures; generate and download a verification report.
+**Verify this image** offers a convenient real follow-up using the protected bytes. For interview demonstrations, also show the explicit saved-file re-upload journey.
 
-Then log in as a second seeded user and confirm that the first user's IDs and download URLs are inaccessible.
+No login, seeded account, collection, crawler, job dashboard or report history is needed. Save outputs/reports within their 15-minute default window. Use the same browser within its private metadata retention window.
 
+Use the CLI benchmark for measured robustness, including failures and negative controls. Do not claim universal survival, legal ownership or recipient intent.

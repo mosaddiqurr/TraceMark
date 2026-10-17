@@ -1,19 +1,16 @@
-# Architecture
+# Focused architecture
 
-    Browser -> Nginx -> FastAPI -> PostgreSQL
-                         |       -> Redis/Dramatiq -> Workers
-                         |       -> private MinIO
-                         + workers use the standalone watermark engine
+React/TypeScript/Vite → FastAPI → bounded spawned image processor → existing independent watermark/forensic engine.
 
-The API owns authentication, authorization, validation, metadata, evidence classification, and object-download decisions. Workers receive opaque job and storage identifiers, re-check job ownership and state, and write immutable results. The watermark package has no dependency on FastAPI or storage.
+SQLite retains only private anonymous workspace capabilities and trace descriptors. The API holds transient protected output bytes and report snapshots in bounded memory. Netlify, Vercel or equivalent static hosting serves the frontend build. The public API prefix is set through build-time VITE_API_URL.
 
-## Trust boundaries
+No original image store, PostgreSQL, Redis, MinIO, Dramatiq, account service, crawler or queue is needed. One native API process and a persistent private SQLite directory cover the product.
 
-Browser input, uploaded bytes, archives, remote URL responses, database rows, queue messages, and object-store objects are untrusted at entry. Secrets are injected at runtime and split by purpose using HKDF. Buckets are private and object keys are randomized.
+The browser workspace cookie is random and HttpOnly. Only its keyed digest is stored. Every registry lookup and output/report download is owner-scoped. CSRF and exact origin checks protect mutations. Expiry cascades trace deletion.
 
-## Processing flow
+The parent owns shared-memory buffers and provenance temporary directories and removes them after child completion/termination. Processing admission is bounded and immediate; a hard deadline terminates CPU work. See [Python multiprocessing](https://docs.python.org/3/library/multiprocessing.html) for the process lifecycle primitives.
 
-Protection validates and normalizes an upload, stores the original, creates an opaque token, queues embedding, stores the protected output, computes metrics, and records audit evidence. Verification stores a temporary normalized input, then layers exact digest, authenticated extraction, perceptual hashes, local features, and provenance into a deterministic classification.
+Descriptor comparison reuses pHash-family fingerprints and real ORB/ratio-test/RANSAC checks without saving original pixels. VERIFIED requires HMAC authentication plus an authorized trace. The original classical robust and LSB algorithms remain independent of the API.
 
-See 'DECISIONS.md' for rationale and 'docs/DATA_MODEL.md' for ownership relationships.
+Run one API process/replica. Memory artifacts, admission and rate windows are not shared. An external trusted ingress must cover distributed abuse control if the design is extended. Default SQLite quotas make this a modest deployment, not an enterprise service.
 

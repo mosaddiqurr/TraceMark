@@ -1,8 +1,13 @@
-# Benchmark Guide
+# Benchmark guide
 
-Run 'make benchmark' after setup. The generator creates only deterministic licence-safe local images and records seeds/provenance. Profiles cover clean, recompression, format conversion, resizing, crops, rotation, tonal changes, blur, sharpening, noise, overlays, and conversion chains.
+Run `make benchmark` or `./scripts/benchmark.ps1` after setup.
 
-Compare negative controls, LSB, and robust outputs. Record every attempted case, including failures, with detection, integrity, bit errors where ground truth exists, corrected symbols, votes, dimensions, size, PSNR/SSIM where meaningful, duration, and error reason.
+The deterministic generator writes local, licence-safe fixtures plus their seed/provenance manifest to `datasets/generated`. The CLI quick profile selects the first two sorted images and measures the existing robust and LSB engines against clean output, JPEG quality 85 and a 75% resize. Standard uses all generated images and also JPEG quality 60.
 
-Never remove a failed case from the denominator. Update 'EVALUATION.md' only from captured machine-readable results.
+Results are written to `artifacts/benchmark-results.json`: every attempt, authenticated extraction, corrected symbols, repetitions, duration, failure reason and PSNR/SSIM against the protected image where dimensions match. Unmarked inputs are checked with both engines. The benchmark uses its documented public test key, never production keys.
 
+Do not remove failed cases from the denominator. A small synthetic run cannot establish universal robustness or a population false-positive rate. Crops, rotation, chained edits and wider natural-image calibration remain future evaluation work; they are not implemented benchmark profiles.
+
+Exports use strict JSON. Infinite PSNR for identical pixels is represented as `null`; extraction results and counts are unchanged. Metrics are also `null` where image dimensions cannot be compared.
+
+Update `EVALUATION.md` and `STATUS.md` only from captured output. The benchmark is a CLI research tool; it is intentionally absent from the application navigation.

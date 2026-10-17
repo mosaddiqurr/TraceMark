@@ -1,14 +1,21 @@
-# Known Limitations
+# Known limitations
 
-- TraceMark supports JPEG, PNG, and WebP still images only; video, audio, animation, and nested archives are out of scope.
-- A recovered distribution token identifies the database copy that carried it. It does not prove who shared the file, recipient intent, authorship, or a legal conclusion.
-- Severe crops, geometric distortion, repainting, or deliberate watermark removal can defeat a classical blind watermark.
-- The recorded quick benchmark recovered 0/2 robust marks after 75% resizing. Resize synchronization requires further research and is not represented as working.
-- The present negative benchmark is deliberately small; it demonstrates integrity behavior but is not a statistically meaningful population false-positive estimate.
-- Perceptual and local-feature matches indicate visual similarity, not cryptographic identity. The current API vertical slice uses pHash thresholds for classification and exposes ORB/RANSAC through the engine interface; wider calibration is unfinished.
-- C2PA is optional. The SDK/native binding was unavailable on this host, so the browser demonstration correctly reported `unsupported`; signing with development credentials was not exercised.
-- Public scanning is limited to a supplied direct image or one HTML page. It is not a crawler and cannot establish absence from the internet. Robots enforcement is not yet complete.
-- Protection, scan, collection rescan, benchmark, and report generation currently run synchronously in the API vertical slice. Dramatiq queues exist but are not yet the execution path, so production cancellation/timeouts/quotas are not accepted.
-- The generated PDF path is covered by API behavior but has not received the required rendered-page visual review.
-- The frontend production bundle is about 718 kB before gzip and emits a code-splitting advisory.
-- Docker Desktop is unavailable on the host. PostgreSQL, Redis, MinIO, Nginx, worker isolation, Compose health, persistence, and full container E2E remain unverified.
+- Still JPEG, PNG and WebP inputs only. Animation, video, audio, archives and URL scanning are outside the public product.
+- An authenticated opaque identifier resolves a protected copy in this browser's private registry. It cannot prove authorship, legal ownership, recipient intent or who shared an image.
+- Payload authenticity does not certify unmodified pixels. Hash and visual checks remain separate evidence; watermark transplant/collusion resistance has not been comprehensively evaluated.
+- Severe recompression, cropping, resizing, geometric distortion, repainting and deliberate watermark removal can defeat extraction. The current resize regression returns visual similarity without a valid watermark.
+- Protection is content-dependent. The API returns success only after extracting the authenticated watermark from the actual saved PNG. Images with insufficient block capacity or failed recovery are rejected.
+- Perceptual hashes and ORB/RANSAC measure visual similarity. The distance threshold is a heuristic, not a calibrated probability or population false-positive estimate. The quick benchmark has only two synthetic source fixtures.
+- Only current robust strengths (32, 36, 42) and key version 1 are searched. Key rotation and migration from the retired account/asset schema are not implemented.
+- C2PA inspection is optional; missing native bindings or temporary access report an explicit unavailable state. C2PA signing and trust-store management are not provided.
+- Registry metadata lasts until the browser workspace expires (30 days by default), is cleared, or its database is removed. Losing the cookie or using another browser loses access to the private mapping, even if the watermark remains authentic.
+- Images and report snapshots stay in bounded memory for at most 15 minutes by default. Restarting the API invalidates outstanding download links. Save protected copies and exported reports promptly.
+- The JSON report uses a service-secret HMAC. It is not a publicly verifiable digital signature. The PDF is a readable summary; Unicode outside the built-in font is represented with visible escapes.
+- This deployment requires one API worker and one replica. Rate limits, processing admission and transient artifacts are local to that process. Horizontal scaling requires a shared limiter/artifact design.
+- The timed processor child shares the API's operating-system permissions. It supplies resource and lifecycle separation; a compromised native decoder can still threaten that account.
+- Public operation needs HTTPS, persistent SQLite storage, independent secrets, exact origins and trusted ingress request/connection limits. The application deadline and admission cap do not replace host CPU/memory isolation.
+- If the host delays child termination or cleanup, further processing stays unavailable until reaping completes. Failed OS cleanup requires operational recovery; requests do not receive unrestricted replacement processors.
+- Static frontend and API hosts on unrelated sites may encounter browser third-party cookie restrictions. Use the same-origin hosting rewrite or custom subdomains of one site.
+- Previous enterprise database/object-store files are neither read nor migrated nor deleted automatically. Their owner should archive or remove them deliberately.
+- No source-code license was supplied; a public deployment does not grant source redistribution rights. Generated sample fixtures have their own documented CC0 provenance.
+- Automated axe WCAG A/AA checks cover the four pages and populated result screens at the supported viewports. They do not establish complete accessibility conformance; manual screen-reader and assistive-technology testing remains outside the measured acceptance gates.

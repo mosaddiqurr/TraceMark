@@ -53,9 +53,7 @@ class WatermarkEngine(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def embed(
-        self, image: Image.Image, payload: WatermarkPayload, master_key: bytes
-    ) -> EmbedResult:
+    def embed(self, image: Image.Image, payload: WatermarkPayload, master_key: bytes) -> EmbedResult:
         raise NotImplementedError
 
     @abstractmethod
@@ -70,4 +68,3 @@ class WatermarkEngine(ABC):
 
     def diagnostics(self, result: EmbedResult | ExtractionResult) -> dict[str, Any]:
         return dict(result.diagnostics)
-

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from collections import defaultdict
 from hashlib import sha256
 from io import BytesIO
@@ -51,8 +52,7 @@ def main() -> None:
     if args.profile == "standard":
         attacks.extend(["jpeg60"])
     paths = sorted(
-        path for path in args.dataset.iterdir()
-        if path.suffix.casefold() in {".jpg", ".jpeg", ".png", ".webp"}
+        path for path in args.dataset.iterdir() if path.suffix.casefold() in {".jpg", ".jpeg", ".png", ".webp"}
     )
     if args.profile == "quick":
         paths = paths[:2]
@@ -79,19 +79,28 @@ def main() -> None:
                 quality = None
                 if candidate.size == protected.size:
                     measured = measure_quality(protected, candidate)
-                    quality = {"ssim": measured.ssim, "psnr_db": measured.psnr_db}
-                records.append({
-                    "image": path.name, "engine": name, "attack": attack,
-                    "detected": result.valid,
-                    "integrity_valid": result.valid,
-                    "corrected_symbols": result.corrected_symbols,
-                    "repetitions_found": result.repetitions_found,
-                    "duration_ms": duration_ms,
-                    "quality": quality,
-                    "failure_reason": result.integrity_error,
-                })
+                    quality = {
+                        "ssim": measured.ssim if math.isfinite(measured.ssim) else None,
+                        "psnr_db": measured.psnr_db if math.isfinite(measured.psnr_db) else None,
+                    }
+                records.append(
+                    {
+                        "image": path.name,
+                        "engine": name,
+                        "attack": attack,
+                        "detected": result.valid,
+                        "integrity_valid": result.valid,
+                        "corrected_symbols": result.corrected_symbols,
+                        "repetitions_found": result.repetitions_found,
+                        "duration_ms": duration_ms,
+                        "quality": quality,
+                        "failure_reason": result.integrity_error,
+                    }
+                )
 
-    grouped: dict[str, dict[str, dict[str, int]]] = defaultdict(lambda: defaultdict(lambda: {"detected": 0, "total": 0}))
+    grouped: dict[str, dict[str, dict[str, int]]] = defaultdict(
+        lambda: defaultdict(lambda: {"detected": 0, "total": 0})
+    )
     for record in records:
         cell = grouped[str(record["engine"])][str(record["attack"])]
         cell["total"] += 1
@@ -104,13 +113,16 @@ def main() -> None:
         for engine, attacks_summary in grouped.items()
     }
     output = {
-        "schema_version": 1, "profile": args.profile, "seed": SEED,
+        "schema_version": 1,
+        "profile": args.profile,
+        "seed": SEED,
         "dataset_files": [path.name for path in paths],
         "negative_false_positives": negatives,
-        "summary": summary, "records": records,
+        "summary": summary,
+        "records": records,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(output, indent=2), encoding="utf-8")
+    args.output.write_text(json.dumps(output, indent=2, allow_nan=False), encoding="utf-8")
     print(json.dumps({"output": str(args.output), "summary": summary, "negative_false_positives": negatives}, indent=2))
 
 

@@ -1,36 +1,32 @@
-# TraceMark Frozen Specification
+# TraceMark Focused Specification
 
-## Product statement
+Updated: 2026-10-05. This user-directed scope replaces the original enterprise specification.
 
-TraceMark is an educational and research-oriented still-image forensics platform for ownership verification, controlled-distribution tracing, provenance analysis, collection search, and robustness evaluation. Findings are evidence, not conclusive legal proof and not proof of a recipient's intent.
+## Purpose
 
-## Supported scope
+Protect a still image with an authenticated, opaque identifier; download the protected copy; later verify an image, inspect trace evidence, and export a concise report. Evidence does not prove legal ownership, authorship, recipient intent, or who shared a file.
 
-- Input/output formats: JPEG, PNG, and WebP.
-- Real authentication, per-user isolation, private object storage, queued processing, audit events, and versioned APIs.
-- Optional visible text/logo watermark and authenticated invisible ownership or distribution watermark.
-- Educational LSB engine and an independently implemented blind classical transform-domain engine.
-- Exact hashing, perceptual hashing, ORB/RANSAC visual confirmation, optional C2PA evidence, internal indexed collections, and explicitly authorized public URL scanning.
-- Robustness experiments, HTML/PDF/JSON reports, responsive accessible UI, reproducible local deployment, seed/demo assets, automated tests, and security validation.
+## Product
 
-Out of scope are video/audio, unrestricted internet search, authenticated scraping, access-control bypasses, paid core APIs, blockchain marketing, and personal information embedded in pixels.
+- Home, Protect, Verify, About. No accounts, teams, dashboards, collections, scanners, history, job UI or benchmark UI.
+- JPEG, PNG and WebP still-image inputs. Lossless PNG protected output.
+- Existing blind Haar-DWT / DCT / QIM engine; error correction and HMAC acceptance. Labels never enter pixels.
+- Optional private reference/recipient label gives a separately tokenized distribution copy.
+- Bounded extraction across existing strengths 32/36/42 and the existing educational LSB baseline.
+- Authentication, exact SHA-256 hashes, perceptual fingerprints, actual ORB/RANSAC checks and optional C2PA availability remain separate evidence.
+- VERIFIED requires an authenticated watermark and a trace in the current private browser workspace. Exact hashes and visual similarity alone never suffice. Authentic unresolved marks are reported explicitly.
+- Generated sample workflow and PDF/JSON reports attached to each result.
 
-## Core behavior
+## Architecture and privacy
 
-1. A user can register an image, inspect safe metadata/fingerprints, configure protection, generate and download a protected output, and inspect PSNR/SSIM/file-size/pixel-difference evidence.
-2. A user can create separately tokenized distribution copies and later recover an authorized distribution mapping without the original image.
-3. Extraction is blind, returns diagnostics, and accepts identifiers only after error correction and HMAC verification.
-4. Verification layers exact hashes, watermark evidence, perceptual distances, local features, and provenance into deterministic evidence classifications without a fabricated aggregate score.
-5. Users can create/index/search collections from images, batches, safe ZIP files, generated demo data, or query uploads.
-6. Users can scan only direct public images or a single explicitly submitted public page with DNS, redirect, robots, size, timeout, and content restrictions.
-7. Users can run repeatable quick, standard, aggressive, or custom transformations and export measured results and reports.
-8. Long operations use queued/running/completed/failed/cancelled jobs with progress and controlled errors.
+One React/TypeScript/Vite client, one native FastAPI process, a persistent private SQLite metadata directory. No PostgreSQL, Redis, S3/MinIO, external worker or queue dependencies. Private anonymous HttpOnly cookies and CSRF preserve isolation without accounts.
 
-## Security requirements
+Uploaded pixels are discarded. Protected downloads and report snapshots remain in bounded private memory for 15 minutes by default. Identifiers, source/output hashes, compact visual descriptors, private labels and timestamps persist until the workspace expires (30 days by default) or is explicitly cleared. Temporary C2PA files are parent-managed and cleaned even after worker termination.
 
-Argon2id credentials, opaque cookie sessions, CSRF protection, restricted CORS, rate limiting, generic auth failures, authorization-scoped queries, MIME/content validation, decompression-bomb limits, safe storage keys, metadata removal, archive traversal/expansion controls, SSRF defenses, escaped reports, secret separation, private buckets, timeouts, quotas, and temporary-file cleanup are mandatory.
+## Security
 
-## Definition of done
+Strict signatures/content types, byte/pixel/dimension/frame limits, bounded request bodies including chunked uploads, safe filenames, timed isolated processing, bounded concurrency, fixed registry quotas, exact CORS, CSRF, scoped downloads and reports, stable safe errors, sensitive-input-free logs, distinct environment secrets and a least-privileged execution account and host resource limits.
 
-Completion requires: clean documented startup; working authentication; visible, LSB, and robust blind watermark round trips; forged/wrong-key rejection; unique distribution recovery; exact/perceptual/local-feature evidence; collection indexing/search; safe URL scan; real robustness results including negative controls; report exports; cross-user isolation; real-UI end-to-end coverage; security and production builds passing; complete required documentation; no fake core feature or mandatory TODO; honest limitations; and an accurate final `STATUS.md`.
+## Acceptance
 
+Real Protect → Download → Re-upload → Verify → Evidence → Export journey; honest invalid/unmarked/altered/offline states; private workspace isolation; embed/extract/wrong-key/forged-payload tests; frontend accessibility/layout at 1440/1366/768/390; lint/format/types/build, dependency audits and measured CLI benchmark. Direct deployment acceptance also requires native process restart/persistence checks and production-build browser journeys. Report unavailable validation honestly.

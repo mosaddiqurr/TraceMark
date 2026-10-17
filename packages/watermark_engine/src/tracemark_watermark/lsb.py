@@ -69,33 +69,22 @@ class LSBWatermarkEngine(WatermarkEngine):
         width: int,
         height: int,
     ) -> np.ndarray:
-        placement_key = derive_subkey(
-            master_key, "lsb-placement", key_version=key_version
-        )
-        context = (
-            b"lsb/v1/"
-            + width.to_bytes(4, "big")
-            + height.to_bytes(4, "big")
-        )
+        placement_key = derive_subkey(master_key, "lsb-placement", key_version=key_version)
+        context = b"lsb/v1/" + width.to_bytes(4, "big") + height.to_bytes(4, "big")
         rng = np.random.default_rng(deterministic_seed(placement_key, context))
         return rng.choice(width * height * 3, size=_REQUIRED_BITS, replace=False)
 
-    def embed(
-        self, image: Image.Image, payload: WatermarkPayload, master_key: bytes
-    ) -> EmbedResult:
+    def embed(self, image: Image.Image, payload: WatermarkPayload, master_key: bytes) -> EmbedResult:
         capacity = self.capacity(image)
         if not capacity.fits:
             raise CapacityError(
-                f"image has {capacity.available_bits} writable bits; "
-                f"{capacity.required_bits} are required"
+                f"image has {capacity.available_bits} writable bits; {capacity.required_bits} are required"
             )
         if payload.algorithm_version != self.algorithm_version:
             raise ValueError("payload algorithm_version does not identify LSB v1")
         rgb, alpha = _rgb_and_alpha(image)
         flat = rgb.reshape(-1)
-        positions = self._positions(
-            master_key, payload.key_version, image.width, image.height
-        )
+        positions = self._positions(master_key, payload.key_version, image.width, image.height)
         payload_bits = _bits(encode_payload(payload, master_key))
         flat[positions] = (flat[positions] & 0xFE) | payload_bits
         return EmbedResult(
@@ -128,16 +117,12 @@ class LSBWatermarkEngine(WatermarkEngine):
         flat = rgb.reshape(-1)
         errors: list[str] = []
         for key_version in dict.fromkeys(key_versions):
-            positions = self._positions(
-                master_key, key_version, image.width, image.height
-            )
+            positions = self._positions(master_key, key_version, image.width, image.height)
             codeword = _bytes(flat[positions] & 1)
             try:
-                decoded = decode_payload(
-                    codeword, master_key, key_version=key_version
-                )
+                decoded = decode_payload(codeword, master_key, key_version=key_version)
             except PayloadError as exc:
-                errors.append(type(exc).__name__)
+                errors.append("payload_hmac_invalid" if "HMAC validation failed" in str(exc) else type(exc).__name__)
                 continue
             if decoded.payload.algorithm_version != self.algorithm_version:
                 errors.append("algorithm_version_mismatch")
@@ -161,4 +146,3 @@ class LSBWatermarkEngine(WatermarkEngine):
             candidate_transformations=("identity",),
             diagnostics={"candidate_errors": tuple(errors)},
         )
-

@@ -1,47 +1,121 @@
-import { screen, waitFor } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import axe from "axe-core";
 import { App } from "./App";
+import { setCsrfToken } from "./api/client";
 import { renderApp } from "./test/render";
 
-const signedOut = () => vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ code: "unauthenticated", message: "Authentication required" }), { status: 401, headers: { "Content-Type": "application/json" } }));
-
 describe("TraceMark application", () => {
-  beforeEach(() => vi.restoreAllMocks());
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    setCsrfToken(null);
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          csrf_token: "test-csrf",
+          expires_at: "2026-11-01",
+          limits: {
+            max_upload_bytes: 20971520,
+            max_image_pixels: 4000000,
+            max_image_dimension: 4096,
+            output_ttl_seconds: 900,
+            retention_seconds: 2592000,
+          },
+        }),
+        { headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    Object.defineProperty(URL, "createObjectURL", {
+      configurable: true,
+      value: vi.fn(() => "blob:test"),
+    });
+    Object.defineProperty(URL, "revokeObjectURL", {
+      configurable: true,
+      value: vi.fn(),
+    });
+    vi.spyOn(window, "scrollTo").mockImplementation(() => undefined);
+  });
 
-  it("presents the evidence-led landing page", async () => {
-    signedOut();
+  it("presents the focused journey with exactly four navigation destinations", () => {
     renderApp(<App />);
-    expect(screen.getByRole("heading", { name: /leave a mark/i })).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByRole("link", { name: /create workspace/i })).toBeInTheDocument());
+    expect(
+      screen.getByRole("heading", { name: /protect the image/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /protect an image/i }),
+    ).toHaveAttribute("href", "/protect");
+    expect(
+      screen.getByRole("link", { name: /verify an image/i }),
+    ).toHaveAttribute("href", "/verify");
+    expect(screen.getByRole("navigation")).toHaveTextContent(
+      "HomeProtectVerifyAbout",
+    );
+    expect(screen.queryByText(/sign in/i)).not.toBeInTheDocument();
   });
 
-  it("redirects a signed-out workspace request to sign in", async () => {
-    signedOut();
-    renderApp(<App />, ["/app"]);
-    expect(await screen.findByRole("heading", { name: /sign in to tracemark/i })).toBeInTheDocument();
+  it("offers protection directly without login and validates unsupported files", async () => {
+    renderApp(<App />, ["/protect"]);
+    expect(
+      screen.getByRole("heading", { name: /protect an image/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /^protect image$/i }),
+    ).toBeDisabled();
+    const user = userEvent.setup({ applyAccept: false });
+    await user.upload(
+      screen.getByLabelText("Choose image"),
+      new File(["hello"], "file.txt", { type: "text/plain" }),
+    );
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /JPEG, PNG or WebP/i,
+    );
+    expect(
+      screen.getByRole("button", { name: /^protect image$/i }),
+    ).toBeDisabled();
   });
 
-  it("submits credentials through the session API", async () => {
-    const fetchMock = signedOut();
-    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ code: "unauthenticated", message: "Authentication required" }), { status: 401, headers: { "Content-Type": "application/json" } }));
-    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ user: { id: "user-1", email: "analyst@example.test", display_name: "Analyst", role: "user" }, csrf_token: "csrf" }), { status: 200, headers: { "Content-Type": "application/json" } }));
-    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ asset_count: 0, protected_count: 0, collection_count: 0, active_job_count: 0, recent_jobs: [] }), { status: 200, headers: { "Content-Type": "application/json" } }));
-    renderApp(<App />, ["/login"]);
-    const user = userEvent.setup();
-    await user.type(await screen.findByLabelText(/email address/i), "analyst@example.test");
-    await user.type(screen.getByLabelText(/^password/i), "correct horse battery staple");
-    await user.click(screen.getByRole("button", { name: /^sign in/i }));
-    expect(await screen.findByRole("heading", { name: /evidence overview/i })).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledWith("/api/v1/auth/login", expect.objectContaining({ credentials: "include", method: "POST" }));
+  it("shows a readable backend failure during automatic verification", async () => {
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(
+      new TypeError("Failed to fetch"),
+    );
+    renderApp(<App />, ["/verify"]);
+    await userEvent
+      .setup()
+      .upload(
+        screen.getByLabelText("Choose image"),
+        new File(["sample"], "image.png", { type: "image/png" }),
+      );
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /backend service is unavailable/i,
+    );
+    expect(
+      screen.getByRole("button", { name: /retry verification/i }),
+    ).toBeEnabled();
   });
 
-  it("has no automatically detectable critical accessibility violations on the landing page", async () => {
-    signedOut();
+  it("explains privacy, integrity and honest limitations", () => {
+    renderApp(<App />, ["/about"]);
+    expect(
+      screen.getByRole("heading", { name: /privacy and security/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/legal ownership, who shared/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/opaque HttpOnly browser cookie/i),
+    ).toBeInTheDocument();
+  });
+
+  it("has no automatically detectable serious or critical accessibility violations", async () => {
     const { container } = renderApp(<App />);
-    await screen.findByRole("link", { name: /create workspace/i });
-    const results = await axe.run(container, { rules: { "color-contrast": { enabled: false } } });
-    expect(results.violations.filter((violation) => violation.impact === "critical")).toEqual([]);
+    const results = await axe.run(container, {
+      rules: { "color-contrast": { enabled: false } },
+    });
+    expect(
+      results.violations.filter(
+        (v) => v.impact === "critical" || v.impact === "serious",
+      ),
+    ).toEqual([]);
   });
 });

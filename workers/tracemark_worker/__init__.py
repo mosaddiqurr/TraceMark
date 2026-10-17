@@ -1,2 +1,0 @@
-"""TraceMark Dramatiq worker package."""
-

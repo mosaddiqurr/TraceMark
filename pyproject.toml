@@ -16,7 +16,6 @@ markers = [
 [tool.ruff]
 target-version = "py312"
 line-length = 120
-extend-exclude = ["alembic/versions"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "S", "ASYNC"]
@@ -24,6 +23,7 @@ ignore = ["S101", "E501"]
 
 [tool.ruff.lint.per-file-ignores]
 "apps/api/tracemark_api/dependencies.py" = ["B008"]
+"apps/api/tracemark_api/runner.py" = ["S301", "S403"] # Trusted parent/child IPC only; never external pickles.
 "apps/api/tracemark_api/routes/*.py" = ["B008"]
 "packages/watermark_engine/src/tracemark_watermark/payload.py" = ["S311"]
 "tests/**/*.py" = ["S105", "S106"]

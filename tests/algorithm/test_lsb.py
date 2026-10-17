@@ -44,9 +44,7 @@ def test_lsb_rejects_wrong_key() -> None:
     payload = WatermarkPayload(PayloadType.DISTRIBUTION, 1, 1, b"D" * 16)
     embedded = LSBWatermarkEngine().embed(source, payload, b"a" * 32)
 
-    result = LSBWatermarkEngine().extract(
-        embedded.image, b"b" * 32, key_versions=[1]
-    )
+    result = LSBWatermarkEngine().extract(embedded.image, b"b" * 32, key_versions=[1])
 
     assert result.valid is False
     assert result.payload is None
@@ -57,4 +55,3 @@ def test_lsb_refuses_insufficient_capacity() -> None:
     payload = WatermarkPayload(PayloadType.OWNERSHIP, 1, 1, b"A" * 16)
     with pytest.raises(CapacityError):
         LSBWatermarkEngine().embed(source, payload, b"k" * 32)
-

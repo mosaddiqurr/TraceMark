@@ -1,8 +1,15 @@
-# Data Model
+# Focused data model
 
-Users own assets, jobs, verifications, collections, scans, benchmarks, and reports. Assets reference immutable original metadata and have profiles, protected outputs, distributions, verification history, and benchmark history.
+Two SQLite tables replace the enterprise schema:
 
-A distribution stores an opaque embedded token and optional database-only label/reference. Verification records immutable evidence snapshots and may resolve to an authorized asset/distribution. Collection items and scan candidates share indexed-media fingerprints while retaining source and first/last-seen evidence.
+| Table | Stored fields |
+|---|---|
+| browser_workspaces | Random workspace ID, HMAC digest of capability cookie, CSRF value, absolute expiry |
+| image_traces | Opaque watermark identifier, owner workspace ID, safe source filename, private label, payload kind, original/output SHA-256, compact fingerprint/ORB descriptor, UTC creation timestamp |
 
-All externally visible identifiers are UUIDs. Watermark tokens are independent random 128-bit values. Database records store key versions, never raw master keys. Audit events are append-only and contain actor, action, object reference, correlation ID, safe metadata, and timestamp.
+Trace owner is a cascading foreign key. All trace queries filter the active workspace. No image bytes, master/report keys or plaintext cookie values are stored. Descriptors are private derived data, not anonymized.
+
+Protected PNGs and sealed reports use random artifact IDs in private bounded process memory with independent expiry. Artifact IDs are not watermark identifiers. Downloads require the owner cookie. Restarting the API loses transient artifacts while SQLite traces survive.
+
+Expired workspace deletion and explicit clearing remove logical records. Disk pages/WAL/backup copies can retain remnants; no secure-erasure claim is made. There is no migration from the old account schema; the new registry has its own filename/root.
 

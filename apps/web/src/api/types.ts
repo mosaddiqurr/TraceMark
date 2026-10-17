@@ -1,65 +1,70 @@
-export type JobState = "queued" | "running" | "completed" | "failed" | "cancelled";
-export type WatermarkType = "visible" | "lsb" | "robust" | "combined";
-export type EvidenceClassification =
-  | "exact_registered_hash"
-  | "valid_distribution_watermark"
-  | "valid_ownership_watermark"
-  | "invalid_authenticated_payload"
-  | "calibrated_visual_derivative"
-  | "possible_visual_match"
-  | "no_evidence"
-  | "inconclusive";
-
-export interface User { id: string; email: string; display_name: string; role: "user" | "admin" }
-export interface SessionResponse { user: User; csrf_token: string }
-export interface Page<T> { items: T[]; total?: number; next_cursor?: string | null }
-export interface Job {
-  id: string;
-  state: JobState;
-  stage: string;
-  progress: number;
-  cancellable: boolean;
-  created_at: string;
-  updated_at: string;
-  result_url?: string | null;
-  error?: { code: string; message: string } | null;
+export interface Workspace {
+  csrf_token: string;
+  expires_at: string;
+  limits: {
+    max_upload_bytes: number;
+    max_image_pixels: number;
+    max_image_dimension: number;
+    output_ttl_seconds: number;
+    retention_seconds: number;
+  };
 }
-export interface Asset {
-  id: string;
-  name: string;
-  media_type: string;
+export interface ImageDetails {
+  filename: string;
   width: number;
   height: number;
   size_bytes: number;
-  created_at: string;
-  thumbnail_url?: string;
+  media_type: string;
+  sha256: string;
 }
-export interface Distribution {
-  id: string;
-  asset_id: string;
-  recipient_label: string;
-  reference?: string;
+export interface Protection {
+  identifier: string;
+  reference_label: string | null;
+  status: "protected";
+  file: ImageDetails;
+  profile: string;
+  quality: Record<string, number | null>;
   created_at: string;
-  download_url?: string;
-}
-export interface Collection { id: string; name: string; item_count: number; updated_at: string; state?: JobState }
-export interface Report { id: string; kind: "verification" | "benchmark"; title: string; created_at: string; formats: string[] }
-export interface Scan { id: string; url: string; state: JobState; candidate_count: number; match_count: number; created_at: string }
-export interface BenchmarkResult { transformation: string; parameter: string; robust_detected: boolean; lsb_detected: boolean; ssim?: number; psnr?: number }
-export interface BenchmarkRun { id: string; name: string; profile: string; state: JobState; created_at: string; results?: BenchmarkResult[] }
-export interface DashboardSummary {
-  asset_count: number;
-  protected_count: number;
-  collection_count: number;
-  active_job_count: number;
-  recent_jobs: Job[];
+  download_url: string;
+  download_expires_at: string;
+  trace_expires_at: string;
 }
 export interface Evidence {
   id: string;
-  classification: EvidenceClassification;
+  verified: boolean;
+  classification: string;
   created_at: string;
-  exact_hash_match: boolean;
-  watermark?: { valid: boolean; type?: WatermarkType; repetitions_found?: number; corrected_symbols?: number };
-  visual?: { phash_distance?: number; orb_matches?: number; ransac_inliers?: number; homography_valid?: boolean };
-  provenance?: { state: string; detail?: string };
+  identifier: string | null;
+  reference_label: string | null;
+  source_filename: string | null;
+  protected_at: string | null;
+  file: ImageDetails;
+  watermark: {
+    authentic: boolean;
+    integrity_state: string;
+    type: string | null;
+    algorithm: string;
+    algorithm_version: number | null;
+    key_version: number | null;
+    repetitions_found: number;
+    corrected_symbols: number | null;
+    integrity_error: string | null;
+  };
+  exact_hash: { matched: boolean; kind: "protected_copy" | "source" | null };
+  visual: {
+    phash_distance: number;
+    dhash_distance: number;
+    whash_distance: number;
+    orb_available: boolean;
+    orb_match_count: number | null;
+    ransac_inliers: number | null;
+    inlier_ratio: number | null;
+    homography_valid: boolean | null;
+    failure_reason: string | null;
+    similar: boolean;
+    note: string;
+  } | null;
+  provenance: { state: string; detail?: string };
+  limitations: string[];
+  report: { download_url: string; expires_at: string };
 }

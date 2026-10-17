@@ -81,7 +81,9 @@ class DecodedPayload:
 def _permutation(master_key: bytes, key_version: int) -> list[int]:
     key = derive_subkey(master_key, "payload-interleave", key_version=key_version)
     values = list(range(CODEWORD_BYTES))
-    random.Random(deterministic_seed(key, b"RS(58,38)")).shuffle(values)
+    # Compatibility permutation only; token generation and payload authentication
+    # use secrets/HMAC. This PRNG is not relied on for cryptographic security.
+    random.Random(deterministic_seed(key, b"RS(58,38)")).shuffle(values)  # nosec B311
     return values
 
 
@@ -110,9 +112,7 @@ def encode_payload(payload: WatermarkPayload, master_key: bytes) -> bytes:
         payload.token,
     )
     crc = _CRC.pack(zlib.crc32(header) & 0xFFFFFFFF)
-    auth_key = derive_subkey(
-        master_key, "payload-authentication", key_version=payload.key_version
-    )
+    auth_key = derive_subkey(master_key, "payload-authentication", key_version=payload.key_version)
     tag = hmac.new(auth_key, header + crc, hashlib.sha256).digest()[:TAG_BYTES]
     raw = header + crc + tag
     if len(raw) != RAW_PAYLOAD_BYTES:  # defensive wire-format invariant
@@ -152,17 +152,7 @@ def decode_payload(
     if not hmac.compare_digest(crc_bytes, _CRC.pack(expected_crc)):
         raise PayloadIntegrityError("payload CRC validation failed")
 
-    magic, payload_version, raw_type, algorithm_version, embedded_version, token = (
-        _HEADER.unpack(header)
-    )
-    auth_key = derive_subkey(
-        master_key, "payload-authentication", key_version=key_version
-    )
-    expected_tag = hmac.new(auth_key, header + crc_bytes, hashlib.sha256).digest()[
-        :TAG_BYTES
-    ]
-    if not hmac.compare_digest(supplied_tag, expected_tag):
-        raise PayloadIntegrityError("payload HMAC validation failed")
+    magic, payload_version, raw_type, algorithm_version, embedded_version, token = _HEADER.unpack(header)
     if magic != MAGIC or payload_version != PAYLOAD_VERSION:
         raise PayloadIntegrityError("unsupported payload header")
     if embedded_version != key_version:
@@ -171,6 +161,10 @@ def decode_payload(
         payload_type = PayloadType(raw_type)
     except ValueError as exc:
         raise PayloadIntegrityError("unknown payload type") from exc
+    auth_key = derive_subkey(master_key, "payload-authentication", key_version=key_version)
+    expected_tag = hmac.new(auth_key, header + crc_bytes, hashlib.sha256).digest()[:TAG_BYTES]
+    if not hmac.compare_digest(supplied_tag, expected_tag):
+        raise PayloadIntegrityError("payload HMAC validation failed")
     return DecodedPayload(
         payload=WatermarkPayload(
             payload_type=payload_type,
@@ -181,4 +175,3 @@ def decode_payload(
         ),
         corrected_symbols=len(errata),
     )
-

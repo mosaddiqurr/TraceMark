@@ -64,4 +64,3 @@ def test_optional_provenance_adapter_reports_absent_sdk_honestly(tmp_path) -> No
         ProvenanceState.VERIFICATION_UNAVAILABLE,
     }
     assert result.detail
-

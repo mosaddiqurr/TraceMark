@@ -1,26 +1,30 @@
 # Threat Model
 
-## Assets and trust boundaries
+Updated: 2026-10-05 for direct hosting.
 
-Protected assets, originals, distribution mappings, watermark/report keys, sessions, reports, audit events, and user identity are sensitive. Browser, reverse proxy, API, Redis, worker, PostgreSQL, MinIO, uploaded bytes, archives, and public network fetches are separate trust boundaries.
+The browser, static host/proxy, FastAPI process, SQLite directory, child image processor, temporary provenance directory and untrusted input bytes are separate boundaries.
 
-## Threats and required mitigations
-
-| Threat | Mitigation |
+| Threat | Control |
 |---|---|
-| Malicious/corrupt/decompression-bomb image | Byte, pixel, frame, MIME and decode limits; isolated timed worker; metadata sanitization |
-| Path traversal or unsafe storage | Random object keys; no user paths; canonical archive extraction checks |
-| ZIP slip/expansion | Entry/count/size/ratio limits; no symlinks, absolute paths, traversal, or nested archives |
-| IDOR/unauthorized download | Owner-scoped queries and authorization checks before every object operation |
-| Forged/wrong-key payload | Reed-Solomon correction followed by constant-time HMAC verification; never trust CRC alone |
-| Stored XSS/report injection | React escaping, server validation, CSP, HTML/PDF escaping, safe filenames |
-| SQL injection | SQLAlchemy bound statements and allow-listed sorting/filtering |
-| CSRF/CORS/session theft | CSRF token, HttpOnly/SameSite/Secure cookies, restricted origins, rotation and logout invalidation |
-| Brute force/job denial of service | Per-IP/account rate limits, per-user quotas, bounded queues, concurrency and timeout limits |
-| SSRF/redirect/DNS rebinding | HTTP(S) only, public-address validation, DNS pinning, peer verification, manual redirects, response caps |
-| Unsafe report replay/tampering | Immutable evidence snapshots and versioned HMAC-authenticated JSON exports |
-| Secret leakage | Mounted/env secrets, key versions only in DB, redacted structured logs, private object buckets |
-| Stale temporary data | Unique job directories, `finally` cleanup, periodic abandoned-job cleanup |
+| Spoofed, corrupt, animated or huge images | Signature/MIME agreement, decoded verification, byte/pixel/dimension/frame caps |
+| Slow uploads / multipart expansion | Actual-body cap before parser/spooling, upload deadline, proxy body cap |
+| CPU exhaustion | Immediate bounded admission, spawned child process, hard termination deadline |
+| Persistent image leakage | No original image store; private TTL-bounded output memory; parent-owned temporary cleanup |
+| Cross-browser IDOR | Owner-scoped metadata queries and transient output/report lookups; uniform 404 |
+| Forged watermark | ECC recovery followed by constant-time HMAC verification; opaque identifiers only |
+| Similarity falsely presented as authentication | VERIFIED requires both integrity and an authorized trace; separate hash/visual evidence |
+| CSRF / session theft | Random capability cookie, HttpOnly, production Secure, exact origins, CSRF on mutations |
+| Session/database leakage | HMAC session digests; no keys or plaintext cookies in the registry |
+| Report tampering | Canonical immutable evidence snapshot, independent HMAC key, integrity check at every export |
+| XSS / report injection | React escaping, bounded single-line labels, PDF text escaping, CSP, safe filenames |
+| Abuse / memory and disk growth | Per-IP fixed windows, bounded limiter cardinality, output byte/count cap, trace/workspace quotas, expiry cleanup |
+| Secret leakage in errors/logs | Error codes and correlation IDs; exception types only, no bodies/credentials/session/key values |
+| Infrastructure exposure | Least-privileged API account, private SQLite directory, host resource limits, HTTPS at hosting ingress |
 
-Security tests must exercise each mitigation before release.
+Operational boundaries: one Uvicorn worker and one API replica. Rate limits and transient memory are process-local. Client IPs are not trusted from arbitrary forwarded headers. Add a trusted ingress limiter for distributed deployments. Descriptors are sensitive derived data and can reveal image structure; they are not anonymized.
 
+The processor child shares the API's operating-system account and permissions. Its separation bounds lifetime and resources; a compromised native decoder can threaten that account. Keep codec dependencies patched and enforce least privilege, host resource limits and bounded temporary storage.
+
+Cookie loss or expiry removes access to private mappings. Unresolved authentic watermarks do not expose another workspace's identifier, filename, label or timestamp. Clearing a workspace invalidates in-flight evidence and cascades metadata deletion.
+
+No URL scanner/crawler is reachable. The retired safe-fetch utility and its focused regression tests remain as an independent defensive example, with no runtime network workflow.

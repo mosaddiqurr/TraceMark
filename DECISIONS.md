@@ -1,42 +1,47 @@
-# Architectural Decisions
+# Architectural decisions
 
-## D001 — Modular monorepo
+## D013 — Focused accountless application
 
-Use React/Vite for the web client, FastAPI/SQLAlchemy for the API, a framework-independent Python watermark package, and Dramatiq workers. PostgreSQL stores relational evidence, Redis stores sessions/queue state, and MinIO stores private binary artifacts.
+Use React/Vite, one FastAPI process and private SQLite metadata. Random HttpOnly browser workspace cookies, CSRF and exact origins preserve owner isolation without accounts. Cookie loss prevents access to private mappings; an authentic unresolved watermark remains distinct from verified private evidence.
 
-## D002 — Server-side opaque sessions
+## D003 / D004 / D005 — Authenticated classical watermark and separate evidence
 
-Use random Redis-backed sessions in HTTP-only cookies plus CSRF tokens. This makes logout/revocation immediate and avoids placing authorization claims in browser-readable storage.
+Embed a random 128-bit token with version metadata, CRC, error correction and HMAC. Keep labels outside pixels. The independent wavelet/DCT/QIM engine uses keyed placement, repetition and Reed-Solomon correction. VERIFIED requires successful authentication and an authorized mapping. Hashes, visual features and optional provenance remain separate measurements.
 
-## D003 — Authenticated opaque pixel payload
+## D014 — Retain descriptors, discard pixels
 
-Embed only a random 128-bit token plus version metadata, CRC, and truncated HMAC. Resolve people/assets from authorized database records; never embed labels or PII.
+Persist session digests, opaque identifiers, private labels, source/output hashes, compact perceptual/ORB descriptors and timestamps. Protected downloads and authenticated report snapshots use bounded memory. Workspace expiry or explicit clearing removes metadata and temporary artifacts. Descriptors remain sensitive derived data.
 
-## D004 — Classical robust contribution
+## D015 / D016 — Hard deadlines and bounded memory transfer
 
-Implement the primary watermark internally with wavelet bands, keyed DCT coefficient placement, quantization modulation, repetition, interleaving, Reed-Solomon correction, and HMAC acceptance. Third-party watermark wrappers cannot replace it.
+Spawn one admitted processor by default and terminate overdue work. A thread timeout cannot stop CPU processing. Parent-owned shared memory transfers trusted internal arguments/results; no external serialized object is accepted. Completion/timeout kills and joins children, unlinks buffers, removes provenance temporary files and releases admission. Output serialization is capped at 32 MiB. Provision at least 128 MiB shared-memory capacity at default limits.
 
-## D005 — Evidence, not an aggregate confidence score
+Cap OpenBLAS/OMP/MKL/NumExpr threads at one before imports. Extra API workers would break process-local rate and artifact behavior; throughput expansion needs a shared-state design.
 
-Use deterministic classifications with constituent cryptographic, hash, feature, and provenance measurements shown separately.
+## D017 — Safe framework logging
 
-## D006 — Bounded source scanning
+SQLAlchemy hides bound parameters. Application and Uvicorn formatting records exception types without values or tracebacks; access logging is disabled. Correlation IDs preserve limited diagnostics without exposing sensitive state.
 
-Scan only a direct image or one explicitly supplied public HTML page. Do not recursively crawl. Validate and pin public DNS results and every redirect.
+## D018 — Results belong to the accepted file
 
-## D007 — Optional provenance adapter
+Clear the prior Verify result and preview when rejecting a new file. A prior VERIFIED panel alongside a new unsupported-file error could misrepresent the rejected input. A browser regression exercises this transition.
 
-Use `c2pa-python` when supported. Dependency or platform failures become explicit unsupported/unavailable states and cannot break the core pixel watermark.
+## D019 — Readiness reads registry tables
 
-## D008 — Reproducible containers plus native Windows workflow
+Read one identifier from each required workspace/trace table and return a safe 503 on database failure. A constant query does not exercise those tables. Liveness is separate; read readiness does not guarantee a subsequent write or image operation.
 
-Linux containers are the deployment reference. PowerShell scripts support local development, but container acceptance remains required before release completion.
+## D020 — Direct native API and static hosting (2026-10-05)
 
+Deploy the existing FastAPI application on a standard Python host and its production React build on Netlify/Vercel or equivalent. Keep SQLite because workspace capabilities and trace evidence must survive restarts. A persistent private mount, stable independent environment secrets, exact HTTPS origins and secure cookies are required.
 
-## D009 — Development-only memory sessions
+Prefer HTTPS subdomains of one site to avoid third-party cookie restrictions. A same-origin hosting rewrite is optional and subject to provider timeouts. Run one API worker/instance under a least-privileged account with host resource and ingress limits; processing children share that account's permissions.
 
-Native browser demonstration may select an in-memory session backend only outside production. Production settings validation mandates Redis. CSRF tokens are retained only inside the server-side session record so concurrent session rehydration is stable; only their HMAC digest is used for comparison and no token is written to relational storage or logs.
+Acceptance includes a cold native Uvicorn restart with real HTTP Protect/Verify/export operations. SQLite mappings survive; temporary artifacts deliberately do not. The browser gate builds and serves the production frontend with a direct API URL. Live provider TLS, ingress and mount verification remains a deployment-time check.
 
-## D010 — Honest synchronous vertical slice
+## D021 — Defer cleanup until the operating system reaps a child
 
-Core workflows execute real algorithms synchronously until Dramatiq orchestration is complete. Completed job resources describe the observed result, but the product is not called production-ready and cancellation/worker-isolation acceptance stays open.
+A delayed process exit exposed a live-process close error during real verification. After bounded terminate/kill waits, transfer shared buffers and temporary directories to a background reaper if the process remains alive. Block new processing admission until reaping and cleanup finish. This preserves completed evidence without closing a live process or releasing its resources prematurely; it also prevents overdue children from expanding processing concurrency. If OS reaping or cleanup cannot complete, admission stays closed until operational recovery. A lifecycle fault regression simulates delayed termination; real engine and restart/browser checks remain separate acceptance gates.
+
+## Download and provenance contracts
+
+Consume API-advertised output/report URLs with authenticated binary downloads and safe filenames. Search only the supported robust strengths (32, 36, 42). Optional C2PA dependency/platform failure cannot invalidate independent authenticated pixel evidence. All registry and artifact lookups remain owner-scoped.

@@ -56,4 +56,3 @@ def test_payload_rejects_wrong_key_and_wrong_candidate_version() -> None:
 def test_payload_refuses_non_opaque_token_size() -> None:
     with pytest.raises(PayloadError, match="128 bits"):
         WatermarkPayload(PayloadType.OWNERSHIP, 1, 1, b"too-short")
-

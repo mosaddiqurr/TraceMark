@@ -108,4 +108,3 @@ class C2PAProvenanceAdapter(ProvenanceAdapter):
         state_text = str(manifest.get("validation_state", "")).lower()
         state = ProvenanceState.VALID if state_text in {"valid", "trusted"} else ProvenanceState.INVALID
         return ProvenanceResult(state, manifest=manifest)
-

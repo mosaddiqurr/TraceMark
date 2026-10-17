@@ -1,42 +1,37 @@
-"""Authentication and CSRF request dependencies."""
+"""Owner isolation and CSRF remain mandatory without user accounts."""
 
 from __future__ import annotations
 
+from collections.abc import Generator
 from typing import cast
-from uuid import UUID
 
 from fastapi import Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
-from .database import get_db
-from .models import User
-from .sessions import SessionRecord
+from .models import Workspace
 
 
-async def get_session_record(request: Request) -> SessionRecord:
-    token = request.cookies.get(request.app.state.settings.cookie_name)
-    record = await request.app.state.sessions.resolve(token)
-    if record is None:
-        raise HTTPException(status_code=401, detail="authentication required")
-    request.state.session_record = record
-    return cast(SessionRecord, record)
+def get_db(request: Request) -> Generator[Session, None, None]:
+    with request.app.state.session_factory() as session:
+        yield session
 
 
-def get_current_user(
-    record: SessionRecord = Depends(get_session_record), session: Session = Depends(get_db)
-) -> User:
-    try:
-        user_id = UUID(record.user_id)
-    except ValueError as exc:
-        raise HTTPException(status_code=401, detail="authentication required") from exc
-    user = session.get(User, user_id)
-    if user is None or not user.is_active:
-        raise HTTPException(status_code=401, detail="authentication required")
-    return user
+def require_origin(request: Request) -> None:
+    origin = request.headers.get("origin")
+    if origin is not None and origin not in request.app.state.settings.allowed_origins:
+        raise HTTPException(403, "This frontend origin is not allowed.")
+    if origin is None and request.headers.get("sec-fetch-site") == "cross-site":
+        raise HTTPException(403, "Cross-site requests require an allowed origin.")
 
 
-async def require_csrf(request: Request, record: SessionRecord = Depends(get_session_record)) -> None:
-    token = request.headers.get("x-csrf-token")
-    if not request.app.state.sessions.verify_csrf(record, token):
-        raise HTTPException(status_code=403, detail="CSRF validation failed")
+def get_workspace(request: Request) -> Workspace:
+    workspace = request.app.state.sessions.resolve(request.cookies.get(request.app.state.settings.cookie_name))
+    if workspace is None:
+        raise HTTPException(401, "Your private browser workspace has expired. Reload the page to start a new one.")
+    return cast(Workspace, workspace)
 
+
+def require_csrf(request: Request, workspace: Workspace = Depends(get_workspace)) -> None:
+    require_origin(request)
+    if not request.app.state.sessions.verify_csrf(workspace, request.headers.get("x-csrf-token")):
+        raise HTTPException(403, "The workspace security check failed. Reload the page and try again.")

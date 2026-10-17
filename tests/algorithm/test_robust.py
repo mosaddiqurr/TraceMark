@@ -66,9 +66,7 @@ def test_robust_wrong_key_is_not_accepted() -> None:
     payload = WatermarkPayload(PayloadType.OWNERSHIP, 2, 1, b"X" * 16)
     embedded = RobustWatermarkEngine().embed(source, payload, b"a" * 32)
 
-    extracted = RobustWatermarkEngine().extract(
-        embedded.image, b"b" * 32, key_versions=[1]
-    )
+    extracted = RobustWatermarkEngine().extract(embedded.image, b"b" * 32, key_versions=[1])
 
     assert extracted.valid is False
     assert extracted.payload is None
@@ -82,4 +80,3 @@ def test_robust_refuses_small_image_instead_of_reducing_redundancy() -> None:
     assert engine.capacity(source).fits is False
     with pytest.raises(CapacityError):
         engine.embed(source, payload, b"k" * 32)
-

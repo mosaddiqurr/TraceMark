@@ -1,27 +1,26 @@
-"""Small Redis-backed fixed-window limiter for abuse-sensitive endpoints."""
+"""Bounded limiter for the documented single API worker deployment."""
 
 from __future__ import annotations
 
+import hashlib
+import hmac
+import threading
 import time
 
 
 class RateLimiter:
-    def __init__(self, redis_client: object | None = None):
-        self.redis = redis_client
-        self.memory: dict[str, tuple[int, int]] = {}
+    def __init__(self, pepper: str):
+        self._pepper = pepper.encode()
+        self._buckets: dict[str, tuple[int, float]] = {}
+        self._lock = threading.Lock()
 
-    async def allow(self, key: str, limit: int, window_seconds: int) -> bool:
-        window = int(time.time()) // window_seconds
-        namespaced = f"rate:{window}:{key}"
-        if self.redis is not None:
-            count = await self.redis.incr(namespaced)  # type: ignore[attr-defined]
-            if count == 1:
-                await self.redis.expire(namespaced, window_seconds + 1)  # type: ignore[attr-defined]
-            return int(count) <= limit
-        count, stored_window = self.memory.get(key, (0, window))
-        if stored_window != window:
-            count = 0
-        count += 1
-        self.memory[key] = (count, window)
-        return count <= limit
-
+    def allow(self, identity: str, category: str, limit: int, window_seconds: int) -> bool:
+        key = hmac.new(self._pepper, f"{identity}:{category}".encode(), hashlib.sha256).hexdigest()
+        now = time.monotonic()
+        with self._lock:
+            self._buckets = {k: v for k, v in self._buckets.items() if v[1] > now}
+            count, until = self._buckets.get(key, (0, now + window_seconds))
+            if key not in self._buckets and len(self._buckets) >= 4096:
+                return False
+            self._buckets[key] = (count + 1, until)
+            return count < limit
