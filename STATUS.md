@@ -38,4 +38,6 @@ Verdict: **GO — READY FOR GITHUB AND DIRECT DEPLOYMENT**, with the documented 
 
 ## GitHub publication — 2026-10-17
 
-The owner authorized publication to [mosaddiqurr/TraceMark](https://github.com/mosaddiqurr/TraceMark). The destination was confirmed empty. Current publication candidates and existing local history were checked for private files and credential patterns; no findings were detected. Source publication is in progress. The live demo remains a placeholder; application hosting is a separate deployment step.
+The owner authorized publication to [mosaddiqurr/TraceMark](https://github.com/mosaddiqurr/TraceMark). The destination was confirmed empty. Current publication candidates and existing local history were checked for private files and credential patterns; no findings were detected. The prepared source was published to main in commit eaeb2ebf3696dfeb0c733e0b9a697b235f377d1f.
+
+GitHub's email-privacy protection initially rejected the local author address. Only the unpublished author/committer email fields were replaced with the verified account's no-reply address; source trees and authorship were preserved, and originals remain in a local-only backup ref. No account privacy settings were changed. The live demo remains a placeholder; application hosting is a separate deployment step.
