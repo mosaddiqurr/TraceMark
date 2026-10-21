@@ -13,6 +13,7 @@ from time import perf_counter
 
 from PIL import Image
 from tracemark_watermark import (
+    CanonicalWatermarkEngine,
     LSBWatermarkEngine,
     PayloadType,
     RobustWatermarkEngine,
@@ -24,20 +25,32 @@ KEY = b"TraceMark deterministic local benchmark key v1"
 SEED = 20260720
 
 
+def _encoded(image: Image.Image, format_name: str, quality: int) -> Image.Image:
+    stream = BytesIO()
+    image.convert("RGB").save(stream, format=format_name, quality=quality)
+    return Image.open(BytesIO(stream.getvalue())).copy()
+
+
+def _scaled(image: Image.Image, factor: float) -> Image.Image:
+    return image.resize((int(image.width * factor), int(image.height * factor)), Image.Resampling.LANCZOS)
+
+
 def transformed(image: Image.Image, attack: str) -> Image.Image:
     if attack == "clean":
         return image.copy()
     if attack.startswith("jpeg"):
-        quality = int(attack.removeprefix("jpeg"))
-        stream = BytesIO()
-        image.convert("RGB").save(stream, format="JPEG", quality=quality)
-        return Image.open(BytesIO(stream.getvalue())).copy()
+        return _encoded(image, "JPEG", int(attack.removeprefix("jpeg")))
+    if attack == "webp80":
+        return _encoded(image, "WEBP", 80)
     if attack == "resize75":
-        smaller = image.resize(
-            (int(image.width * 0.75), int(image.height * 0.75)),
-            Image.Resampling.LANCZOS,
-        )
-        return smaller
+        return _scaled(image, 0.75)
+    if attack == "resize50_jpeg80":
+        return _encoded(_scaled(image, 0.5), "JPEG", 80)
+    if attack == "upscale150":
+        return _scaled(image, 1.5)
+    if attack == "crop5":
+        dx, dy = int(image.width * 0.05), int(image.height * 0.05)
+        return image.crop((dx, dy, image.width - dx, image.height - dy))
     raise ValueError(attack)
 
 
@@ -48,18 +61,19 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=Path("artifacts/benchmark-results.json"))
     args = parser.parse_args()
 
-    attacks = ["clean", "jpeg85", "resize75"]
+    attacks = ["clean", "jpeg85", "resize75", "resize50_jpeg80", "upscale150", "webp80", "crop5"]
     if args.profile == "standard":
-        attacks.extend(["jpeg60"])
+        attacks.extend(["jpeg70", "jpeg60"])
     paths = sorted(
         path for path in args.dataset.iterdir() if path.suffix.casefold() in {".jpg", ".jpeg", ".png", ".webp"}
     )
     if args.profile == "quick":
-        paths = paths[:2]
+        paths = paths[:4]
 
     records: list[dict[str, object]] = []
-    negatives = {"robust": 0, "lsb": 0}
+    negatives = {"canonical": 0, "robust": 0, "lsb": 0}
     engines = {
+        "canonical": (CanonicalWatermarkEngine(), 3),
         "robust": (RobustWatermarkEngine(), 2),
         "lsb": (LSBWatermarkEngine(), 1),
     }
@@ -113,7 +127,7 @@ def main() -> None:
         for engine, attacks_summary in grouped.items()
     }
     output = {
-        "schema_version": 1,
+        "schema_version": 2,
         "profile": args.profile,
         "seed": SEED,
         "dataset_files": [path.name for path in paths],

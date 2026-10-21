@@ -5,7 +5,7 @@ description = "TraceMark forensic image watermarking API"
 requires-python = ">=3.12"
 dependencies = [
   "fastapi>=0.116,<1",
-  "pillow>=11,<13",
+  "pillow>=11,<14",
   "reportlab>=4.4,<5",
   "python-multipart>=0.0.20,<1",
   "python-dotenv>=1.1,<2",

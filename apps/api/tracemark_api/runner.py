@@ -45,7 +45,7 @@ def _child(input_name: str, input_size: int, output_name: str, sender: Connectio
                 (
                     False,
                     "invalid_image",
-                    "This image is too small for protection. Try an image at least 432 × 432 pixels.",
+                    "This image is too small for protection. Try an image at least 256 × 256 pixels.",
                 )
             )
         else:

@@ -6,7 +6,8 @@ Engineering topics worth explaining:
 
 - Why random identifiers and private label mappings protect personal data.
 - The distinction between CRC/error correction, HMAC authentication and authorized provenance resolution.
-- Blind classical DWT/DCT/QIM placement, repetition and measured JPEG/resize behavior.
+- Blind classical DWT/DCT/QIM on a resolution-independent canonical grid: resize/JPEG/WebP survival measured against the legacy engine, and an honest crop failure.
+- SSRF-safe link checks, signed trace export/import and an editorial, performance-measured interface.
 - Why exact hashes, perceptual hashes and ORB/RANSAC are separate evidence.
 - Preserving browser-workspace isolation after removing accounts.
 - Discarding uploaded pixels while retaining sparse descriptors; privacy limits of those descriptors.

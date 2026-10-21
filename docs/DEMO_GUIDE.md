@@ -9,7 +9,7 @@
 7. Expand detailed evidence for SHA-256, ECC, pHash and ORB/RANSAC measurements.
 8. Export PDF or JSON directly from the result.
 9. Re-upload the unprotected sample to observe NOT VERIFIED.
-10. Resize the protected image to 75% and verify; recovery can fail while visual evidence may remain.
+10. Resize the protected image to 50% and verify; v3 still recovers it. Crop 5% from each edge and verify; recovery fails while visual evidence may remain.
 11. A second browser workspace must not see the private label or download/report artifacts.
 
 **Verify this image** offers a convenient real follow-up using the protected bytes. For interview demonstrations, also show the explicit saved-file re-upload journey.

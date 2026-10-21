@@ -236,18 +236,31 @@ class RobustWatermarkEngine(WatermarkEngine):
         )
 
     def _read_locations(self, bands: list[np.ndarray], locations: Iterable[_Location]) -> tuple[np.ndarray, np.ndarray]:
-        bits: list[int] = []
-        reliability: list[float] = []
-        for location in locations:
-            row = location.row * BLOCK_SIZE
-            column = location.column * BLOCK_SIZE
-            block = bands[location.band][row : row + BLOCK_SIZE, column : column + BLOCK_SIZE]
-            coefficients = _forward_dct(block)
-            step = self._quantization_step(coefficients, location.coefficient)
-            scaled = float(coefficients[location.coefficient]) / step
-            bits.append(int(round(scaled)) & 1)
-            reliability.append(max(0.0, min(1.0, 1.0 - 2.0 * abs(scaled - round(scaled)))))
-        return np.asarray(bits, dtype=np.uint8), np.asarray(reliability, dtype=np.float64)
+        # Batched equivalent of embedding's per-block step; extraction may read tens of thousands of blocks.
+        selected = list(locations)
+        blocks = np.stack(
+            [
+                bands[location.band][
+                    location.row * BLOCK_SIZE : (location.row + 1) * BLOCK_SIZE,
+                    location.column * BLOCK_SIZE : (location.column + 1) * BLOCK_SIZE,
+                ]
+                for location in selected
+            ]
+        )
+        coefficients = _DCT @ blocks @ _DCT.T
+        targets = np.asarray([location.coefficient for location in selected])
+        index = np.arange(len(selected))
+        magnitudes = np.abs(coefficients)
+        magnitudes[:, 0:2, 0:2] = np.nan
+        magnitudes[index, targets[:, 0], targets[:, 1]] = np.nan
+        activity = np.nanmedian(magnitudes.reshape(len(selected), -1), axis=1)
+        steps = self.strength * (1.0 + np.minimum(activity, 24.0) / 96.0)
+        scaled = coefficients[index, targets[:, 0], targets[:, 1]] / steps
+        # Python's round() is half-to-even, matching numpy's rint.
+        centers = np.rint(scaled)
+        bits = (centers.astype(np.int64) & 1).astype(np.uint8)
+        reliability = np.clip(1.0 - 2.0 * np.abs(scaled - centers), 0.0, 1.0)
+        return bits, np.asarray(reliability, dtype=np.float64)
 
     @staticmethod
     def _candidate_images(image: Image.Image) -> Iterable[tuple[str, Image.Image]]:

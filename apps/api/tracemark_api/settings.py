@@ -46,6 +46,10 @@ class Settings:
     max_workspaces: int = 1000
     max_traces: int = 10000
     processing_rate_limit: int = field(default_factory=lambda: int(os.getenv("TRACEMARK_PROCESSING_RATE_LIMIT", "30")))
+    link_checks_enabled: bool = field(default_factory=lambda: _bool("TRACEMARK_LINK_CHECKS", True))
+    link_check_rate_limit: int = field(default_factory=lambda: int(os.getenv("TRACEMARK_LINK_CHECK_RATE_LIMIT", "10")))
+    link_check_max_images: int = 8
+    link_check_seconds: float = 60.0
     master_key: str = field(
         default_factory=lambda: os.getenv("TRACEMARK_MASTER_KEY", "development-master-key-do-not-deploy")
     )
@@ -103,7 +107,10 @@ class Settings:
             raise ValueError("upload limits are outside supported bounds")
         if not 1 <= self.max_image_dimension <= 8192 or not 1 <= self.output_ttl_seconds <= 3600:
             raise ValueError("dimension/download expiry limits are outside supported bounds")
-        if self.transient_max_bytes < self.max_upload_bytes or self.processing_rate_limit < 1:
+        if (
+            self.transient_max_bytes < self.max_upload_bytes
+            or min(self.processing_rate_limit, self.link_check_rate_limit) < 1
+        ):
             raise ValueError("transient storage/rate limits are invalid")
         return self
 

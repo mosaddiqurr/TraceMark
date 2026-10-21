@@ -1,14 +1,16 @@
 # Known limitations
 
-- Still JPEG, PNG and WebP inputs only. Animation, video, audio, archives and URL scanning are outside the public product.
+- Still JPEG, PNG and WebP inputs only. Animation, video, audio and archives are outside the public product.
+- TraceMark never crawls or searches the web. Link checks fetch one submitted URL and at most eight images it references, from public addresses only. Pages that require login, render images with JavaScript, or block automated requests cannot be checked; private chats and DMs are out of reach.
 - An authenticated opaque identifier resolves a protected copy in this browser's private registry. It cannot prove authorship, legal ownership, recipient intent or who shared an image.
 - Payload authenticity does not certify unmodified pixels. Hash and visual checks remain separate evidence; watermark transplant/collusion resistance has not been comprehensively evaluated.
-- Severe recompression, cropping, resizing, geometric distortion, repainting and deliberate watermark removal can defeat extraction. The current resize regression returns visual similarity without a valid watermark.
+- The v3 engine survives resizing, upscaling, JPEG 70–85 and WebP 80 in the measured benchmark, but cropping (even 5% center crops), rotation, geometric distortion, repainting, severe recompression and deliberate removal can defeat extraction. A bounded center-crop search was prototyped and rejected: it recovered no real crops and added seconds to every verification. The crop regression returns visual similarity without a valid watermark.
+- v3 runs at roughly 39–40 dB PSNR. Faint grain can be visible in large flat dark areas under close inspection. Perceptual masking was evaluated but is undone by the closed-loop canonical correction, so it was not adopted.
 - Protection is content-dependent. The API returns success only after extracting the authenticated watermark from the actual saved PNG. Images with insufficient block capacity or failed recovery are rejected.
-- Perceptual hashes and ORB/RANSAC measure visual similarity. The distance threshold is a heuristic, not a calibrated probability or population false-positive estimate. The quick benchmark has only two synthetic source fixtures.
-- Only current robust strengths (32, 36, 42) and key version 1 are searched. Key rotation and migration from the retired account/asset schema are not implemented.
+- Perceptual hashes and ORB/RANSAC measure visual similarity. The distance threshold is a heuristic, not a calibrated probability or population false-positive estimate. The quick benchmark has only four synthetic source fixtures.
+- Verification tries v3 first, then the legacy v2 strengths (32, 36, 42) and the LSB baseline, all for key version 1. Key rotation and migration from the retired account/asset schema are not implemented.
 - C2PA inspection is optional; missing native bindings or temporary access report an explicit unavailable state. C2PA signing and trust-store management are not provided.
-- Registry metadata lasts until the browser workspace expires (30 days by default), is cleared, or its database is removed. Losing the cookie or using another browser loses access to the private mapping, even if the watermark remains authentic.
+- Registry metadata lasts until the browser workspace expires (30 days by default), is cleared, or its database is removed. Losing the cookie or using another browser loses access to the private mapping unless a saved trace-record export is restored. The export is a bearer secret and is only accepted by the deployment whose report key signed it.
 - Images and report snapshots stay in bounded memory for at most 15 minutes by default. Restarting the API invalidates outstanding download links. Save protected copies and exported reports promptly.
 - The JSON report uses a service-secret HMAC. It is not a publicly verifiable digital signature. The PDF is a readable summary; Unicode outside the built-in font is represented with visible escapes.
 - This deployment requires one API worker and one replica. Rate limits, processing admission and transient artifacts are local to that process. Horizontal scaling requires a shared limiter/artifact design.

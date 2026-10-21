@@ -45,3 +45,25 @@ A delayed process exit exposed a live-process close error during real verificati
 ## Download and provenance contracts
 
 Consume API-advertised output/report URLs with authenticated binary downloads and safe filenames. Search only the supported robust strengths (32, 36, 42). Optional C2PA dependency/platform failure cannot invalidate independent authenticated pixel evidence. All registry and artifact lookups remain owner-scoped.
+
+## D022 — Resolution-independent v3 watermark (2026-10-22)
+
+v2 derives placement from the submitted width/height and reads an 8 × 8 grid at native resolution, so any resize desynchronizes it (0/2 at 75% in the prior benchmark). v3 embeds into a fixed 256 × 256 canonical luminance image with 4 × 4 DCT blocks and four repetitions, adds the resampled residual over five closed-loop passes, and resamples every candidate copy to the same grid before reading. Strength 20 was chosen over 16 after measurement: WebP 80 survival rose from 5/8 to 8/8 while PSNR fell from ~41.4 to ~39.4 dB. New protections use v3 when both sides are at least 256 px; v2 remains for smaller images and for verifying earlier copies. The two marks use separate placement keys and do not cross-decode.
+
+Rejected: a 512-px canonical grid with 8 × 8 blocks (fails 50% resizes), perceptual masking (negated by closed-loop correction), and a center-crop search (no real crops recovered, multi-second cost on every verification).
+
+## D023 — User-initiated link checks instead of crawling
+
+Finding copies is delegated to reverse image search engines that index visual content. TraceMark verifies only links a person submits: a direct image, or up to eight images referenced by one page. This reuses the DNS-pinned safe fetcher, keeps outbound traffic attributable and bounded, and avoids storing third-party content.
+
+## D024 — Signed, moving trace exports
+
+Private labels were lost with the cookie. A domain-separated HMAC export lets people back up and move records without accounts. Trace identifiers are global primary keys, so restoring a record held by another workspace moves it; the signed export is treated as the owner's credential.
+
+## D025 — Rate-limit workspace creation, not re-confirmation
+
+The frontend confirms its workspace on page load. Counting every confirmation against the 30-per-10-minute creation window rejected ordinary browsing. Only requests that create a workspace consume that window; re-confirmation uses the general request limit.
+
+## D026 — Editorial redesign with a measured hero
+
+The interface moved to a dark editorial system (Bodoni Moda, IBM Plex) with a hero photograph whose lens reveals the image redrawn from identifier characters, labelled as an illustration. The photo renders as a preloaded 40 KB WebP before any script; the character layer is built on idle and only animates while moving. Fonts are self-hosted to satisfy `font-src 'self'`. Home page transfer is ~330 KB.

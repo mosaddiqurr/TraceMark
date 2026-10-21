@@ -1,5 +1,6 @@
 """TraceMark's framework-independent still-image forensic engine."""
 
+from .canonical import CanonicalWatermarkEngine
 from .crypto import KeyMaterialError, derive_subkey, hkdf_sha256
 from .fingerprints import ImageFingerprint, fingerprint, hamming_distance
 from .lsb import LSBWatermarkEngine
@@ -26,6 +27,7 @@ __all__ = [
     "CODEWORD_BYTES",
     "RAW_PAYLOAD_BYTES",
     "C2PAProvenanceAdapter",
+    "CanonicalWatermarkEngine",
     "Capacity",
     "CapacityError",
     "ClassicalSimilarityEngine",

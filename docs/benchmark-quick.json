@@ -1,52 +1,225 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "profile": "quick",
   "seed": 20260720,
   "dataset_files": [
     "alpha-gradient.png",
-    "dark-gradient.jpg"
+    "dark-gradient.jpg",
+    "landscape-edges.webp",
+    "landscape-gradient.png"
   ],
   "negative_false_positives": {
+    "canonical": 0,
     "robust": 0,
     "lsb": 0
   },
   "summary": {
-    "robust": {
+    "canonical": {
       "clean": {
-        "detected": 2,
-        "total": 2,
+        "detected": 4,
+        "total": 4,
         "survival_rate": 1.0
       },
       "jpeg85": {
-        "detected": 2,
-        "total": 2,
+        "detected": 4,
+        "total": 4,
+        "survival_rate": 1.0
+      },
+      "resize75": {
+        "detected": 4,
+        "total": 4,
+        "survival_rate": 1.0
+      },
+      "resize50_jpeg80": {
+        "detected": 4,
+        "total": 4,
+        "survival_rate": 1.0
+      },
+      "upscale150": {
+        "detected": 4,
+        "total": 4,
+        "survival_rate": 1.0
+      },
+      "webp80": {
+        "detected": 4,
+        "total": 4,
+        "survival_rate": 1.0
+      },
+      "crop5": {
+        "detected": 0,
+        "total": 4,
+        "survival_rate": 0.0
+      }
+    },
+    "robust": {
+      "clean": {
+        "detected": 4,
+        "total": 4,
+        "survival_rate": 1.0
+      },
+      "jpeg85": {
+        "detected": 4,
+        "total": 4,
         "survival_rate": 1.0
       },
       "resize75": {
         "detected": 0,
-        "total": 2,
+        "total": 4,
+        "survival_rate": 0.0
+      },
+      "resize50_jpeg80": {
+        "detected": 0,
+        "total": 4,
+        "survival_rate": 0.0
+      },
+      "upscale150": {
+        "detected": 0,
+        "total": 4,
+        "survival_rate": 0.0
+      },
+      "webp80": {
+        "detected": 0,
+        "total": 4,
+        "survival_rate": 0.0
+      },
+      "crop5": {
+        "detected": 0,
+        "total": 4,
         "survival_rate": 0.0
       }
     },
     "lsb": {
       "clean": {
-        "detected": 2,
-        "total": 2,
+        "detected": 4,
+        "total": 4,
         "survival_rate": 1.0
       },
       "jpeg85": {
         "detected": 0,
-        "total": 2,
+        "total": 4,
         "survival_rate": 0.0
       },
       "resize75": {
         "detected": 0,
-        "total": 2,
+        "total": 4,
+        "survival_rate": 0.0
+      },
+      "resize50_jpeg80": {
+        "detected": 0,
+        "total": 4,
+        "survival_rate": 0.0
+      },
+      "upscale150": {
+        "detected": 0,
+        "total": 4,
+        "survival_rate": 0.0
+      },
+      "webp80": {
+        "detected": 0,
+        "total": 4,
+        "survival_rate": 0.0
+      },
+      "crop5": {
+        "detected": 0,
+        "total": 4,
         "survival_rate": 0.0
       }
     }
   },
   "records": [
+    {
+      "image": "alpha-gradient.png",
+      "engine": "canonical",
+      "attack": "clean",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 39.09370000474155,
+      "quality": {
+        "ssim": 1.0,
+        "psnr_db": null
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "canonical",
+      "attack": "jpeg85",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 36.418900010176,
+      "quality": {
+        "ssim": 0.9990981054729666,
+        "psnr_db": 47.571082422009766
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "canonical",
+      "attack": "resize75",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 27.991000009933487,
+      "quality": null,
+      "failure_reason": null
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "canonical",
+      "attack": "resize50_jpeg80",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 2,
+      "duration_ms": 25.970099988626316,
+      "quality": null,
+      "failure_reason": null
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "canonical",
+      "attack": "upscale150",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 64.24879998667166,
+      "quality": null,
+      "failure_reason": null
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "canonical",
+      "attack": "webp80",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 2,
+      "repetitions_found": 0,
+      "duration_ms": 38.35680001066066,
+      "quality": {
+        "ssim": 0.9973374281109341,
+        "psnr_db": 42.77220040535674
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "canonical",
+      "attack": "crop5",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 35.79059999901801,
+      "quality": null,
+      "failure_reason": "PayloadIntegrityError"
+    },
     {
       "image": "alpha-gradient.png",
       "engine": "robust",
@@ -55,7 +228,7 @@
       "integrity_valid": true,
       "corrected_symbols": 0,
       "repetitions_found": 3,
-      "duration_ms": 120.17979999654926,
+      "duration_ms": 49.89440002827905,
       "quality": {
         "ssim": 1.0,
         "psnr_db": null
@@ -70,7 +243,7 @@
       "integrity_valid": true,
       "corrected_symbols": 0,
       "repetitions_found": 3,
-      "duration_ms": 131.70109999919077,
+      "duration_ms": 48.60529999132268,
       "quality": {
         "ssim": 0.9987938465150682,
         "psnr_db": 46.752926902070875
@@ -85,7 +258,58 @@
       "integrity_valid": false,
       "corrected_symbols": null,
       "repetitions_found": 0,
-      "duration_ms": 1481.777000000875,
+      "duration_ms": 651.3584000058472,
+      "quality": null,
+      "failure_reason": "PayloadIntegrityError"
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "robust",
+      "attack": "resize50_jpeg80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 0.22079999325796962,
+      "quality": null,
+      "failure_reason": "insufficient_capacity"
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "robust",
+      "attack": "upscale150",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 2033.6275000008754,
+      "quality": null,
+      "failure_reason": "PayloadIntegrityError"
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "robust",
+      "attack": "webp80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 826.4300000155345,
+      "quality": {
+        "ssim": 0.997997858363479,
+        "psnr_db": 44.313246318316345
+      },
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "robust",
+      "attack": "crop5",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 836.534500005655,
       "quality": null,
       "failure_reason": "PayloadIntegrityError"
     },
@@ -97,7 +321,7 @@
       "integrity_valid": true,
       "corrected_symbols": 0,
       "repetitions_found": 1,
-      "duration_ms": 5.9199000024818815,
+      "duration_ms": 4.76040001376532,
       "quality": {
         "ssim": 1.0,
         "psnr_db": null
@@ -112,7 +336,7 @@
       "integrity_valid": false,
       "corrected_symbols": null,
       "repetitions_found": 0,
-      "duration_ms": 3.7747999958810396,
+      "duration_ms": 4.354099975898862,
       "quality": {
         "ssim": 0.9995213034357687,
         "psnr_db": 50.43054002673115
@@ -127,9 +351,153 @@
       "integrity_valid": false,
       "corrected_symbols": null,
       "repetitions_found": 0,
-      "duration_ms": 3.5648999983095564,
+      "duration_ms": 3.544300008798018,
       "quality": null,
       "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "lsb",
+      "attack": "resize50_jpeg80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 1.9101999932900071,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "lsb",
+      "attack": "upscale150",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 12.64259999152273,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "lsb",
+      "attack": "webp80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 4.878700012341142,
+      "quality": {
+        "ssim": 0.9992637778498373,
+        "psnr_db": 47.79862767121179
+      },
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "alpha-gradient.png",
+      "engine": "lsb",
+      "attack": "crop5",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 4.251399979693815,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "canonical",
+      "attack": "clean",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 42.84310000366531,
+      "quality": {
+        "ssim": 1.0,
+        "psnr_db": null
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "canonical",
+      "attack": "jpeg85",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 36.855700018350035,
+      "quality": {
+        "ssim": 0.9990417470338262,
+        "psnr_db": 47.381867516660904
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "canonical",
+      "attack": "resize75",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 28.40689997537993,
+      "quality": null,
+      "failure_reason": null
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "canonical",
+      "attack": "resize50_jpeg80",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 0,
+      "duration_ms": 24.797899997793138,
+      "quality": null,
+      "failure_reason": null
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "canonical",
+      "attack": "upscale150",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 61.94630000391044,
+      "quality": null,
+      "failure_reason": null
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "canonical",
+      "attack": "webp80",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 1,
+      "duration_ms": 40.164199977880344,
+      "quality": {
+        "ssim": 0.997191288689189,
+        "psnr_db": 42.535900178378505
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "canonical",
+      "attack": "crop5",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 34.90249998867512,
+      "quality": null,
+      "failure_reason": "PayloadIntegrityError"
     },
     {
       "image": "dark-gradient.jpg",
@@ -139,7 +507,7 @@
       "integrity_valid": true,
       "corrected_symbols": 0,
       "repetitions_found": 3,
-      "duration_ms": 167.843899995205,
+      "duration_ms": 47.28389999945648,
       "quality": {
         "ssim": 1.0,
         "psnr_db": null
@@ -154,7 +522,7 @@
       "integrity_valid": true,
       "corrected_symbols": 0,
       "repetitions_found": 3,
-      "duration_ms": 126.83280000055674,
+      "duration_ms": 48.61109997727908,
       "quality": {
         "ssim": 0.9987888432744796,
         "psnr_db": 46.67138299721863
@@ -169,7 +537,58 @@
       "integrity_valid": false,
       "corrected_symbols": null,
       "repetitions_found": 0,
-      "duration_ms": 1486.096799999359,
+      "duration_ms": 568.3536999858916,
+      "quality": null,
+      "failure_reason": "PayloadIntegrityError"
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "robust",
+      "attack": "resize50_jpeg80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 0.22800001897849143,
+      "quality": null,
+      "failure_reason": "insufficient_capacity"
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "robust",
+      "attack": "upscale150",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 1719.1659999953117,
+      "quality": null,
+      "failure_reason": "PayloadIntegrityError"
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "robust",
+      "attack": "webp80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 883.3684999844991,
+      "quality": {
+        "ssim": 0.997925902468757,
+        "psnr_db": 44.01072316026199
+      },
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "robust",
+      "attack": "crop5",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 713.0961999937426,
       "quality": null,
       "failure_reason": "PayloadIntegrityError"
     },
@@ -181,7 +600,7 @@
       "integrity_valid": true,
       "corrected_symbols": 0,
       "repetitions_found": 1,
-      "duration_ms": 3.8274000035016797,
+      "duration_ms": 3.594700014218688,
       "quality": {
         "ssim": 1.0,
         "psnr_db": null
@@ -196,7 +615,7 @@
       "integrity_valid": false,
       "corrected_symbols": null,
       "repetitions_found": 0,
-      "duration_ms": 6.233399995835498,
+      "duration_ms": 4.250600002706051,
       "quality": {
         "ssim": 0.9993939837310577,
         "psnr_db": 49.54359776802612
@@ -211,7 +630,616 @@
       "integrity_valid": false,
       "corrected_symbols": null,
       "repetitions_found": 0,
-      "duration_ms": 4.862799993134104,
+      "duration_ms": 3.2386000093538314,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "lsb",
+      "attack": "resize50_jpeg80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 1.7577999969944358,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "lsb",
+      "attack": "upscale150",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 7.410300022456795,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "lsb",
+      "attack": "webp80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 3.655699983937666,
+      "quality": {
+        "ssim": 0.9989763618799309,
+        "psnr_db": 46.607789901112476
+      },
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "dark-gradient.jpg",
+      "engine": "lsb",
+      "attack": "crop5",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 3.5072000173386186,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "canonical",
+      "attack": "clean",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 38.47540001152083,
+      "quality": {
+        "ssim": 1.0,
+        "psnr_db": null
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "canonical",
+      "attack": "jpeg85",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 40.16169998794794,
+      "quality": {
+        "ssim": 0.9885991675401856,
+        "psnr_db": 39.75014771569593
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "canonical",
+      "attack": "resize75",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 29.834199987817556,
+      "quality": null,
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "canonical",
+      "attack": "resize50_jpeg80",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 2,
+      "repetitions_found": 0,
+      "duration_ms": 23.56640002108179,
+      "quality": null,
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "canonical",
+      "attack": "upscale150",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 66.36110000545159,
+      "quality": null,
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "canonical",
+      "attack": "webp80",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 40.07409999030642,
+      "quality": {
+        "ssim": 0.9807391848367091,
+        "psnr_db": 38.52058031025776
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "canonical",
+      "attack": "crop5",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 36.56049998244271,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "robust",
+      "attack": "clean",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 3,
+      "duration_ms": 54.550500004552305,
+      "quality": {
+        "ssim": 1.0,
+        "psnr_db": null
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "robust",
+      "attack": "jpeg85",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 3,
+      "duration_ms": 50.48740000347607,
+      "quality": {
+        "ssim": 0.9870086350935611,
+        "psnr_db": 39.674002409186976
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "robust",
+      "attack": "resize75",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 601.6735000011977,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "robust",
+      "attack": "resize50_jpeg80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 0.3392999933566898,
+      "quality": null,
+      "failure_reason": "insufficient_capacity"
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "robust",
+      "attack": "upscale150",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 1878.5261000157334,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "robust",
+      "attack": "webp80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 949.7243000078015,
+      "quality": {
+        "ssim": 0.9881382438923527,
+        "psnr_db": 39.34866917081069
+      },
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "robust",
+      "attack": "crop5",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 780.8841000078246,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "lsb",
+      "attack": "clean",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 1,
+      "duration_ms": 3.519099991535768,
+      "quality": {
+        "ssim": 1.0,
+        "psnr_db": null
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "lsb",
+      "attack": "jpeg85",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 3.69070001761429,
+      "quality": {
+        "ssim": 0.9901931430678917,
+        "psnr_db": 40.055211793791095
+      },
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "lsb",
+      "attack": "resize75",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 2.737799979513511,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "lsb",
+      "attack": "resize50_jpeg80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 1.7078000237233937,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "lsb",
+      "attack": "upscale150",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 7.887699990533292,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "lsb",
+      "attack": "webp80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 4.696100018918514,
+      "quality": {
+        "ssim": 0.9968752433737229,
+        "psnr_db": 40.803777638255454
+      },
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-edges.webp",
+      "engine": "lsb",
+      "attack": "crop5",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 3.7534000002779067,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "canonical",
+      "attack": "clean",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 41.238099976908416,
+      "quality": {
+        "ssim": 1.0,
+        "psnr_db": null
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "canonical",
+      "attack": "jpeg85",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 44.11210000398569,
+      "quality": {
+        "ssim": 0.9990693923268517,
+        "psnr_db": 47.48757366223828
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "canonical",
+      "attack": "resize75",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 30.39929998340085,
+      "quality": null,
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "canonical",
+      "attack": "resize50_jpeg80",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 24.266099993837997,
+      "quality": null,
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "canonical",
+      "attack": "upscale150",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 4,
+      "duration_ms": 71.60060000023805,
+      "quality": null,
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "canonical",
+      "attack": "webp80",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 2,
+      "duration_ms": 43.991000013193116,
+      "quality": {
+        "ssim": 0.9972934525677679,
+        "psnr_db": 42.69183448098464
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "canonical",
+      "attack": "crop5",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 38.18850000970997,
+      "quality": null,
+      "failure_reason": "PayloadIntegrityError"
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "robust",
+      "attack": "clean",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 3,
+      "duration_ms": 52.0245999796316,
+      "quality": {
+        "ssim": 1.0,
+        "psnr_db": null
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "robust",
+      "attack": "jpeg85",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 3,
+      "duration_ms": 52.97360001713969,
+      "quality": {
+        "ssim": 0.9990989384959015,
+        "psnr_db": 47.542720961504195
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "robust",
+      "attack": "resize75",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 621.7739999992773,
+      "quality": null,
+      "failure_reason": "PayloadIntegrityError"
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "robust",
+      "attack": "resize50_jpeg80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 0.26450000586919487,
+      "quality": null,
+      "failure_reason": "insufficient_capacity"
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "robust",
+      "attack": "upscale150",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 2035.5562999902759,
+      "quality": null,
+      "failure_reason": "PayloadIntegrityError"
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "robust",
+      "attack": "webp80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 1022.0876000239514,
+      "quality": {
+        "ssim": 0.9985472699486614,
+        "psnr_db": 45.234324287507626
+      },
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "robust",
+      "attack": "crop5",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 854.5573000155855,
+      "quality": null,
+      "failure_reason": "PayloadIntegrityError"
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "lsb",
+      "attack": "clean",
+      "detected": true,
+      "integrity_valid": true,
+      "corrected_symbols": 0,
+      "repetitions_found": 1,
+      "duration_ms": 3.7426000053528696,
+      "quality": {
+        "ssim": 1.0,
+        "psnr_db": null
+      },
+      "failure_reason": null
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "lsb",
+      "attack": "jpeg85",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 3.905199992004782,
+      "quality": {
+        "ssim": 0.9995033704452816,
+        "psnr_db": 50.19768876061327
+      },
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "lsb",
+      "attack": "resize75",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 4.080499988049269,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "lsb",
+      "attack": "resize50_jpeg80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 1.6524000093340874,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "lsb",
+      "attack": "upscale150",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 8.147899992763996,
+      "quality": null,
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "lsb",
+      "attack": "webp80",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 4.491300001973286,
+      "quality": {
+        "ssim": 0.999250409099683,
+        "psnr_db": 47.807951667637816
+      },
+      "failure_reason": "PayloadCorrectionError"
+    },
+    {
+      "image": "landscape-gradient.png",
+      "engine": "lsb",
+      "attack": "crop5",
+      "detected": false,
+      "integrity_valid": false,
+      "corrected_symbols": null,
+      "repetitions_found": 0,
+      "duration_ms": 3.9671999984420836,
       "quality": null,
       "failure_reason": "PayloadCorrectionError"
     }

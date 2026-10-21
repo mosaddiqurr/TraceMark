@@ -287,3 +287,25 @@ export async function downloadReport(
     ),
   );
 }
+
+export async function downloadTraceExport(): Promise<void> {
+  let response: Response;
+  try {
+    response = await fetch(apiUrl("/workspace/export"), {
+      credentials: "include",
+    });
+  } catch {
+    throw new Error("The backend service is unavailable.");
+  }
+  if (!response.ok)
+    throw new ApiError(response.status, await errorBody(response));
+  if (!response.headers.get("Content-Type")?.startsWith("application/json"))
+    throw new Error("The export response was invalid.");
+  saveBlob(
+    await response.blob(),
+    safeDownloadName(
+      response.headers.get("Content-Disposition"),
+      "tracemark-trace-records.json",
+    ),
+  );
+}

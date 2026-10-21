@@ -105,12 +105,20 @@ def test_ownership_exact_source_and_altered_image_have_separate_evidence(account
         image.save(recompressed, format="JPEG", quality=95, subsampling=0)
         resized = BytesIO()
         image.resize((384, 384), Image.Resampling.LANCZOS).save(resized, format="PNG")
+        cropped = BytesIO()
+        image.crop((24, 24, image.width - 24, image.height - 24)).save(cropped, format="PNG")
     jpeg = verify(client, csrf, recompressed.getvalue(), "image/jpeg")
     assert jpeg["verified"] is True
     assert jpeg["exact_hash"]["matched"] is False
+    # Version 3 marks are read on a canonical grid, so a half-size copy still verifies.
     resize = verify(client, csrf, resized.getvalue())
-    assert resize["verified"] is False
-    assert resize["classification"] == "possible_visual_match"
+    assert resize["verified"] is True
+    assert resize["watermark"]["algorithm_version"] == 3
+    assert resize["exact_hash"]["matched"] is False
+    # Cropping shifts that grid; similarity is reported without verifying.
+    crop = verify(client, csrf, cropped.getvalue())
+    assert crop["verified"] is False
+    assert crop["classification"] == "possible_visual_match"
 
 
 def test_wrong_key_forged_payload_and_unregistered_token_are_never_accepted(account: tuple[TestClient, str]) -> None:
