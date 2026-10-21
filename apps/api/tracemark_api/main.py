@@ -19,6 +19,7 @@ from .models import Trace, Workspace
 from .ratelimit import RateLimiter
 from .routes.api import api_router
 from .runner import ProcessingRunner
+from .safe_fetch import SafeFetcher
 from .sessions import SessionManager
 from .settings import Settings, load_settings
 from .transient import TransientStore
@@ -67,6 +68,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.rate_limiter = RateLimiter(settings.session_pepper)
     app.state.runner = ProcessingRunner(settings.processing_concurrency, settings.processing_timeout_seconds)
     app.state.artifacts = TransientStore(settings.transient_max_bytes, settings.output_ttl_seconds)
+    app.state.fetcher = SafeFetcher(
+        max_bytes=settings.max_upload_bytes, max_candidates=settings.link_check_max_images * 2
+    )
     app.add_middleware(BodyLimitMiddleware, max_bytes=settings.max_upload_bytes + 65536)
     app.add_middleware(CorrelationIdMiddleware)
     app.add_middleware(

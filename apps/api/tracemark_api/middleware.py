@@ -91,10 +91,10 @@ class CorrelationIdMiddleware(BaseHTTPMiddleware):
             settings = request.app.state.settings
             limiter = request.app.state.rate_limiter
             identity = request.client.host if request.client else "unknown"
-            if request.url.path.endswith(("/protect", "/verification")):
+            if request.url.path.endswith("/verification/link"):
+                allowed = limiter.allow(identity, "link_checks", settings.link_check_rate_limit, 600)
+            elif request.url.path.endswith(("/protect", "/verification")):
                 allowed = limiter.allow(identity, "processing", settings.processing_rate_limit, 600)
-            elif request.method == "POST" and request.url.path.endswith("/workspace"):
-                allowed = limiter.allow(identity, "workspace", 30, 600)
             else:
                 allowed = limiter.allow(identity, "requests", 240, 60)
             if not allowed:

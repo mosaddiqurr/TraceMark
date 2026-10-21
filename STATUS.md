@@ -1,6 +1,29 @@
 # TraceMark status
 
-Updated: 2026-10-17. Application validation results below were measured on 2026-10-05.
+Updated: 2026-10-22.
+
+## Redesign, v3 watermark, link checks and trace backup — 2026-10-22
+
+The interface was redesigned as a dark editorial system (Bodoni Moda / IBM Plex, self-hosted) with a hero photograph whose lens reveals the image redrawn from identifier characters. New protections use the resolution-independent v3 engine; v2 and LSB remain for verification. Verify accepts links (a direct image or up to eight images on a page) through the DNS-pinned safe fetcher, and About offers signed backup/restore of trace records. Workspace rate limiting now counts only creation. Pillow was upgraded to 13.0.0 and Vite to 6.4.4 for published advisories.
+
+| Check | Result |
+|---|---|
+| Ruff, format, strict MyPy, ESLint, TypeScript, Prettier | PASS |
+| Python tests | PASS: 66 tests, 88.51% coverage (new: canonical engine, link checks, export/import, workspace limiting) |
+| Frontend unit tests | PASS: 9 |
+| Production-build browser suite | PASS: 16/16 at 1440/1366/768/390 px, no retries; includes axe, layout, real protect/download/re-upload/verify, reports, link-check refusal and trace backup/restore |
+| Restart check | PASS: native production startup/restart, SQLite retention, transient expiry, resumed/new Protect/Verify, exports and clear |
+| Bandit, pip-audit, pnpm audit, pip check | PASS: no findings |
+| Production build | JS 309 kB (gzip 97 kB), CSS 26 kB (gzip 6 kB) |
+| Home page load (local preview, 1440 px, cache disabled) | Fast: FCP 224 ms, hero photo 17 ms. Throttled 9 Mbps / 170 ms: FCP 716 ms, hero photo 483 ms. 331 KB transferred |
+
+Quick benchmark (four synthetic fixtures, `docs/benchmark-quick.json`): v3 recovers 4/4 for clean, JPEG-85, resize-75, resize-50 + JPEG-80, upscale-150 and WebP-80, and 0/4 for a 5% center crop. v2 recovers clean and JPEG-85 only; LSB clean only. No engine accepted an unmarked control. v3 PSNR is about 39–40 dB.
+
+Not done: crop tolerance, C2PA signing and paid reverse-search APIs (see LIMITATIONS.md). Nothing was committed, pushed or deployed.
+
+## Earlier validation
+
+Application validation results below were measured on 2026-10-05.
 
 The application now uses direct native Python and static frontend hosting. Obsolete infrastructure, duplicate publication/history documents and unused launch/proxy helpers are removed. Core watermarking, private registry isolation and exports are retained.
 

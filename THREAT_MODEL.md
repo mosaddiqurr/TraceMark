@@ -1,6 +1,6 @@
 # Threat Model
 
-Updated: 2026-10-05 for direct hosting.
+Updated: 2026-10-22 for link checks and trace exports.
 
 The browser, static host/proxy, FastAPI process, SQLite directory, child image processor, temporary provenance directory and untrusted input bytes are separate boundaries.
 
@@ -20,6 +20,10 @@ The browser, static host/proxy, FastAPI process, SQLite directory, child image p
 | Abuse / memory and disk growth | Per-IP fixed windows, bounded limiter cardinality, output byte/count cap, trace/workspace quotas, expiry cleanup |
 | Secret leakage in errors/logs | Error codes and correlation IDs; exception types only, no bodies/credentials/session/key values |
 | Infrastructure exposure | Least-privileged API account, private SQLite directory, host resource limits, HTTPS at hosting ingress |
+| SSRF through link checks | HTTP(S) only, ports 80/443, no userinfo, every resolved address and the connected peer must be public, re-validated on each of at most three redirects, byte cap per response, at most eight page images, 60-second scan budget |
+| Link-check abuse as a fetch proxy | CSRF-protected endpoint, separate per-IP window (10 per 10 minutes by default), responses never returned to the client, kill switch `TRACEMARK_LINK_CHECKS=false` |
+| Forged or crafted trace imports | Domain-separated HMAC over the canonical export, strict schema/size validation, quotas; unsigned or foreign files rejected |
+| Stolen trace export | Treated as a bearer secret in the UI and docs; resolving marks still requires this deployment's keys |
 
 Operational boundaries: one Uvicorn worker and one API replica. Rate limits and transient memory are process-local. Client IPs are not trusted from arbitrary forwarded headers. Add a trusted ingress limiter for distributed deployments. Descriptors are sensitive derived data and can reveal image structure; they are not anonymized.
 
@@ -27,4 +31,4 @@ The processor child shares the API's operating-system account and permissions. I
 
 Cookie loss or expiry removes access to private mappings. Unresolved authentic watermarks do not expose another workspace's identifier, filename, label or timestamp. Clearing a workspace invalidates in-flight evidence and cascades metadata deletion.
 
-No URL scanner/crawler is reachable. The retired safe-fetch utility and its focused regression tests remain as an independent defensive example, with no runtime network workflow.
+No crawler is reachable. The only outbound network workflow is the user-initiated link check above, built on the DNS-pinned safe fetcher and its regression tests. Fetched pages are parsed only for image URLs; scripts are never executed.

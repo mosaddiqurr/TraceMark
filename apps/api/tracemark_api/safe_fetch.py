@@ -59,21 +59,44 @@ class FetchResult:
 
 
 class _ImageParser(HTMLParser):
+    """Collect candidate image URLs: social preview images first, then page images."""
+
     def __init__(self, base_url: str, maximum: int) -> None:
         super().__init__(convert_charrefs=True)
         self.base_url = base_url
         self.maximum = maximum
         self.urls: list[str] = []
 
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if tag.casefold() != "img" or len(self.urls) >= self.maximum:
+    def _add(self, source: str | None) -> None:
+        if not source or len(self.urls) >= self.maximum:
             return
+        candidate = urljoin(self.base_url, source.strip())
+        if urlsplit(candidate).scheme in {"http", "https"} and candidate not in self.urls:
+            self.urls.append(candidate)
+
+    @staticmethod
+    def _largest_srcset(value: str | None) -> str | None:
+        best: tuple[float, str] | None = None
+        for entry in (value or "").split(","):
+            parts = entry.strip().split()
+            if not parts:
+                continue
+            size = 1.0
+            if len(parts) > 1 and parts[1][:-1].replace(".", "", 1).isdigit():
+                size = float(parts[1][:-1])
+            if best is None or size > best[0]:
+                best = (size, parts[0])
+        return best[1] if best else None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
-        source = values.get("src")
-        if source:
-            candidate = urljoin(self.base_url, source)
-            if urlsplit(candidate).scheme in {"http", "https"} and candidate not in self.urls:
-                self.urls.append(candidate)
+        name = tag.casefold()
+        if name == "meta":
+            key = (values.get("property") or values.get("name") or "").casefold()
+            if key in {"og:image", "og:image:url", "og:image:secure_url", "twitter:image"}:
+                self._add(values.get("content"))
+        elif name == "img":
+            self._add(self._largest_srcset(values.get("srcset")) or values.get("data-src") or values.get("src"))
 
 
 class SafeFetcher:
@@ -110,7 +133,7 @@ class SafeFetcher:
                     target += "?" + parsed.query
                 request = (
                     f"GET {target} HTTP/1.1\r\nHost: {host}\r\n"
-                    "User-Agent: TraceMark/0.1 controlled-source-scanner\r\n"
+                    "User-Agent: TraceMark/0.3 link-check (+user-requested)\r\n"
                     "Accept: image/jpeg,image/png,image/webp,text/html;q=0.8\r\n"
                     "Connection: close\r\n\r\n"
                 )
@@ -163,10 +186,13 @@ class SafeFetcher:
             raise HTTPException(status_code=422, detail="direct URL did not return a supported image")
         return result
 
-    def extract_page_images(self, url: str) -> tuple[FetchResult, list[str]]:
-        result = self.fetch(url)
-        if result.content_type != "text/html":
-            raise HTTPException(status_code=422, detail="URL did not return HTML or a supported image")
+    def page_image_urls(self, result: FetchResult) -> list[str]:
+        if result.content_type not in {"text/html", "application/xhtml+xml"}:
+            raise HTTPException(status_code=422, detail="URL did not return a web page or a supported image")
         parser = _ImageParser(result.final_url, self.max_candidates)
         parser.feed(result.body.decode("utf-8", errors="replace"))
-        return result, parser.urls
+        return parser.urls
+
+    def extract_page_images(self, url: str) -> tuple[FetchResult, list[str]]:
+        result = self.fetch(url)
+        return result, self.page_image_urls(result)

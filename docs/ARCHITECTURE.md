@@ -4,7 +4,7 @@ React/TypeScript/Vite → FastAPI → bounded spawned image processor → existi
 
 SQLite retains only private anonymous workspace capabilities and trace descriptors. The API holds transient protected output bytes and report snapshots in bounded memory. Netlify, Vercel or equivalent static hosting serves the frontend build. The public API prefix is set through build-time VITE_API_URL.
 
-No original image store, PostgreSQL, Redis, MinIO, Dramatiq, account service, crawler or queue is needed. One native API process and a persistent private SQLite directory cover the product.
+No original image store, PostgreSQL, Redis, MinIO, Dramatiq, account service, crawler or queue is needed. User-submitted link checks reuse the bounded safe fetcher inside the API process. One native API process and a persistent private SQLite directory cover the product.
 
 The browser workspace cookie is random and HttpOnly. Only its keyed digest is stored. Every registry lookup and output/report download is owner-scoped. CSRF and exact origin checks protect mutations. Expiry cascades trace deletion.
 

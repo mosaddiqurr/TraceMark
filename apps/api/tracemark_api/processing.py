@@ -13,6 +13,7 @@ from uuid import UUID
 from PIL import Image, ImageOps
 from tracemark_watermark import (
     C2PAProvenanceAdapter,
+    CanonicalWatermarkEngine,
     ClassicalSimilarityEngine,
     LSBWatermarkEngine,
     PayloadType,
@@ -55,10 +56,16 @@ def protect(
     # Rotate protection inputs to their displayed EXIF orientation, then strip metadata.
     image = ImageOps.exif_transpose(decoded).convert("RGBA" if "A" in decoded.getbands() else "RGB")
     metadata.update({"width": image.width, "height": image.height})
+    # Resolution-independent v3 survives resizing; v2 remains for images below its canonical size.
+    engine: CanonicalWatermarkEngine | RobustWatermarkEngine = CanonicalWatermarkEngine()
+    if not engine.capacity(image).fits:
+        engine = RobustWatermarkEngine(strength=32.0)
     payload = WatermarkPayload(
-        PayloadType.DISTRIBUTION if labelled else PayloadType.OWNERSHIP, 2, 1, UUID(identifier).bytes
+        PayloadType.DISTRIBUTION if labelled else PayloadType.OWNERSHIP,
+        engine.algorithm_version,
+        1,
+        UUID(identifier).bytes,
     )
-    engine = RobustWatermarkEngine(strength=32.0)
     embedded = engine.embed(image, payload, settings.master_key.encode()).image
     embedded.info.clear()
     output = BytesIO()
@@ -82,6 +89,11 @@ def protect(
         "descriptor": ClassicalSimilarityEngine.describe(image),
         "quality": quality,
         "payload_type": payload.payload_type.name.lower(),
+        "profile": (
+            "Resize-tolerant invisible · canonical DWT-DCT-QIM v3"
+            if engine.algorithm_version == 3
+            else "Balanced invisible · DWT-DCT-QIM v2"
+        ),
     }
 
 
@@ -94,9 +106,9 @@ def verify(
     temporary: str | None = None,
 ) -> dict[str, Any]:
     image, metadata = _decoded(data, filename, mime, settings)
-    candidates = []
-    extraction = None
-    for strength in (32.0, 36.0, 42.0):
+    candidates = [CanonicalWatermarkEngine().extract(image, settings.master_key.encode(), key_versions=[1])]
+    extraction = candidates[0] if candidates[0].valid else None
+    for strength in () if extraction else (32.0, 36.0, 42.0):
         candidate = RobustWatermarkEngine(strength=strength).extract(
             image, settings.master_key.encode(), key_versions=[1]
         )
@@ -197,7 +209,7 @@ def verify(
         "provenance": provenance_view,
         "limitations": [
             "A recovered identifier links to a protected copy; it does not prove legal ownership or who shared it.",
-            "Cropping, resizing, repainting, or deliberate removal can prevent recovery. No transformation survival is guaranteed.",
+            "Cropping, repainting, heavy recompression or deliberate removal can prevent recovery. Resizing is tolerated only within tested bounds; no transformation survival is guaranteed.",
             "Private trace mappings belong to this browser workspace and expire with its retention period.",
             "No aggregate confidence score or population false-positive rate is claimed.",
         ],

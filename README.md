@@ -21,6 +21,10 @@ TraceMark is a focused security portfolio project. Its checks use a real classic
 ## Key features
 
 - Invisible, authenticated identifiers in image pixels, with a separate identifier for each protected copy.
+- A resolution-independent watermark (v3) that survives resizing, upscaling and everyday JPEG/WebP compression in the benchmark below.
+- **Check a link**: paste an image URL, or a page URL whose images (up to eight) are fetched through an SSRF-safe fetcher and verified.
+- Guidance and links for reverse image search (Google Lens, TinEye, Bing) to find copies; TraceMark itself never crawls the web.
+- Signed backup and restore of private trace records, so labels survive cookie loss and can move to another browser.
 - Optional private recipient/reference labels that never enter the image.
 - Evidence that separates watermark integrity, exact hashes, visual similarity and optional provenance.
 - Private browser workspaces, temporary downloads and PDF/JSON exports without accounts.
@@ -29,7 +33,7 @@ TraceMark is a focused security portfolio project. Its checks use a real classic
 
 1. **Protect** a JPEG, PNG or WebP image. Optionally add a private recipient/reference label.
 2. **Download** the protected PNG.
-3. **Verify** the saved copy later in the same browser workspace.
+3. **Verify** a copy later in the same browser workspace: upload it, or paste the link where you found it.
 4. Review authenticity, exact hashes and visual evidence; export **PDF or JSON**.
 
 Home includes a generated sample that runs through the same engine. No account or dashboard is required.
@@ -46,7 +50,7 @@ Home includes a generated sample that runs through the same engine. No account o
 
 ## Protection and verification
 
-The existing blind Haar wavelet / block cosine transform / quantization watermark embeds a random 128-bit token. Reed-Solomon error correction supports recovery; a domain-separated HMAC must pass before any token is accepted. Private labels are resolved from the registry and never embedded in pixels. Every protected PNG is decoded and extracted before the API reports success.
+New protections use the v3 engine: the image's luminance is resampled to a fixed 256 × 256 canonical grid, the authenticated codeword is quantized into keyed 4 × 4 DCT coefficients of the canonical Haar LH/HL bands, and the canonical residual is resampled back over a few closed-loop passes. Extraction resamples any copy to the same grid, so resizing is undone before reading. Images smaller than 256 px per side, and copies protected earlier, use the original v2 engine, which remains supported for verification. Both embed a random 128-bit token. Reed-Solomon error correction supports recovery; a domain-separated HMAC must pass before any token is accepted. Private labels are resolved from the registry and never embedded in pixels. Every protected PNG is decoded and extracted before the API reports success.
 
 Verification tries the bounded supported robust strengths and the existing LSB baseline. SHA-256, perceptual hashes, actual ORB/RANSAC feature checks and optional C2PA inspection remain separate measurements. **VERIFIED** requires a valid watermark and a trace authorized to the browser workspace. Similarity or an exact unmarked source hash alone cannot produce that result. An authentic watermark without an accessible private mapping is reported explicitly.
 
@@ -119,9 +123,29 @@ See [Security](SECURITY.md) and [Threat model](THREAT_MODEL.md).
 
 ## Supported formats and limitations
 
-JPEG, PNG and WebP still-image inputs; lossless PNG protected output. A square image needs at least 432 × 432 pixels for the default three repetitions; actual block capacity controls acceptance of other shapes. Detailed images generally work best. EXIF orientation is applied when protecting and metadata is stripped.
+JPEG, PNG and WebP still-image inputs; lossless PNG protected output. Images need at least 256 px on each side. EXIF orientation is applied when protecting and metadata is stripped.
 
-Cropping, resizing, distortion, repainting and heavy recompression can defeat extraction. The small CLI benchmark is reproducible evidence, not a universal robustness claim. Optional C2PA unavailability does not invalidate independent pixel evidence. See [Watermark method](docs/WATERMARK_ALGORITHM.md) and [Limitations](LIMITATIONS.md).
+Quick benchmark (four deterministic synthetic fixtures, `docs/benchmark-quick.json`):
+
+| Transformation | v3 (default) | v2 (legacy) |
+|---|---|---|
+| Clean / JPEG 85 | 4/4 / 4/4 | 4/4 / 4/4 |
+| Resize to 75% | 4/4 | 0/4 |
+| Resize to 50% + JPEG 80 | 4/4 | 0/4 |
+| Upscale to 150% | 4/4 | 0/4 |
+| WebP 80 | 4/4 | 0/4 |
+| Center crop 5% | **0/4** | 0/4 |
+| Unmarked controls accepted | 0 | 0 |
+
+Cropping still defeats extraction, as do rotation, distortion, repainting, very heavy recompression and deliberate removal; social platforms often crop. v3 trades some invisibility for robustness (about 39–40 dB PSNR); faint grain can be visible in large flat dark areas on close inspection. The benchmark is reproducible evidence on synthetic fixtures, not a universal robustness claim. Optional C2PA unavailability does not invalidate independent pixel evidence. See [Watermark method](docs/WATERMARK_ALGORITHM.md) and [Limitations](LIMITATIONS.md).
+
+## Finding and checking copies
+
+TraceMark does not search the internet for watermarks; nothing indexes invisible marks. To look for copies, upload your protected image to a reverse image search (Google Lens, TinEye, Bing Visual Search). For any page or image you find, use **Check a link** on Verify. The API fetches only that URL, and for a page at most eight images it references (`og:image`, `img src`, `data-src` and the largest `srcset` candidate), through a DNS-pinned fetcher that refuses private, loopback, link-local and reserved addresses on every redirect. Each image runs through the normal timed verification; the strongest result becomes the full evidence and its report records where it was found. Link checks are rate-limited separately and can be disabled with `TRACEMARK_LINK_CHECKS=false`.
+
+## Backing up trace records
+
+About offers **Save trace records** and **Restore from file**. The export is JSON authenticated with a domain-separated HMAC under the report key, so a modified file or one from another deployment is rejected. Restoring moves those records into the current browser's workspace. The file is a bearer secret: anyone holding it can resolve those marks on this deployment.
 
 ## Reports and exports
 
@@ -153,6 +177,10 @@ Current measured results and any unavailable gates are recorded in [STATUS.md](S
 - `tests`: meaningful algorithm, API and security regression coverage.
 - `assets`: supplied TraceMark logo.
 - `scripts`, `docs`: reproducible setup, deployment, evaluation and guides.
+
+## Credits
+
+Hero photograph: “an old fashioned camera with a black background” by Hooman R. on [Unsplash](https://unsplash.com/photos/an-old-fashioned-camera-with-a-black-background-FdNi_4Jg3_E), used under the Unsplash License. Typefaces: Bodoni Moda and IBM Plex (SIL Open Font License), self-hosted via Fontsource.
 
 ## License
 

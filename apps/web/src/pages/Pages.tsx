@@ -3,13 +3,9 @@ import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
-  Check,
   CheckCircle2,
-  ChevronRight,
   Download,
   FileCheck2,
-  Fingerprint,
-  ImagePlus,
   Info,
   LoaderCircle,
   LockKeyhole,
@@ -26,6 +22,12 @@ import {
   setCsrfToken,
 } from "../api/client";
 import type { Evidence, Protection, Workspace } from "../api/types";
+import {
+  FindCopies,
+  LinkCheckPanel,
+  TraceBackup,
+} from "../components/Investigate";
+import { TraceLens } from "../components/TraceLens";
 
 const DEFAULT_LIMITS = {
   max_upload_bytes: 20 * 1024 * 1024,
@@ -210,102 +212,191 @@ function PageHeading({
 }) {
   return (
     <div className="page-heading">
-      {step && <span className="eyebrow">{step}</span>}
-      <h1>{title}</h1>
+      <div>
+        {step && <span className="eyebrow">{step}</span>}
+        <h1>{title}</h1>
+      </div>
       <p>{children}</p>
     </div>
   );
 }
 
+const workflowSteps = [
+  {
+    title: "Protect",
+    text: "Choose a JPEG, PNG or WebP. A fresh identifier is embedded and checked before you get the file.",
+    link: { to: "/protect", label: "Start protecting" },
+  },
+  {
+    title: "Share",
+    text: "Download the protected PNG and send it on. An optional private label, such as “Client review”, stays with you.",
+    aside: "Your download",
+  },
+  {
+    title: "Verify",
+    text: "When a copy turns up, upload it. Blind extraction recovers the identifier without the original.",
+    link: { to: "/verify", label: "Verify a copy" },
+  },
+  {
+    title: "Trace",
+    text: "See which protected copy it is, alongside exact hashes and visual similarity, then export a PDF or JSON report.",
+    aside: "Evidence report",
+  },
+];
+
 export function HomePage() {
   return (
     <div className="home">
       <section className="hero">
-        <span className="eyebrow">
-          <span className="gold-dot" /> Still-image provenance
-        </span>
-        <h1>
-          Protect the image.
-          <br />
-          Keep the trace.
-        </h1>
-        <p>
-          Protect images with traceable identifiers and verify their provenance
-          later.
-        </p>
-        <div className="hero-actions">
-          <Link className="button primary" to="/protect">
-            <ImagePlus size={18} />
-            Protect an image
-            <ArrowRight size={17} />
-          </Link>
-          <Link className="button secondary" to="/verify">
-            <ShieldCheck size={18} />
-            Verify an image
-          </Link>
+        <div className="hero-copy">
+          <span className="eyebrow">Still-image provenance</span>
+          <h1>
+            Protect the image.
+            <br />
+            <em>Keep the trace.</em>
+          </h1>
+          <p className="hero-lead">
+            Give every copy you share its own invisible identifier. If one
+            leaks, upload it here to learn which copy it was, and what the
+            evidence can and cannot prove.
+          </p>
+          <div className="hero-actions">
+            <Link className="button primary" to="/protect">
+              Protect an image
+              <ArrowRight size={17} />
+            </Link>
+            <Link className="button secondary" to="/verify">
+              Verify an image
+            </Link>
+          </div>
+          <p className="hero-footnote">
+            No account. Invisible watermark. Measured evidence.
+          </p>
         </div>
-        <p className="hero-footnote">
-          No account required. Invisible watermark. Verifiable evidence.
+        <TraceLens />
+      </section>
+      <section className="home-intro" aria-labelledby="how-heading">
+        <div>
+          <span className="eyebrow">How it works</span>
+          <h2 id="how-heading">
+            Four steps,
+            <br />
+            <em>one</em> trace.
+          </h2>
+        </div>
+        <p>
+          TraceMark hides a random identifier in the image itself, not in its
+          metadata. Nothing about you or your recipient is written into the
+          pixels; that link stays in your private browser workspace.
         </p>
       </section>
       <ol className="workflow" aria-label="How TraceMark works">
-        {[
-          {
-            icon: ImagePlus,
-            title: "Protect",
-            text: "Embed a private identifier",
-          },
-          {
-            icon: Upload,
-            title: "Share",
-            text: "Download your protected copy",
-          },
-          { icon: ShieldCheck, title: "Verify", text: "Check an image later" },
-          { icon: Fingerprint, title: "Trace", text: "Review the evidence" },
-        ].map(({ icon: Icon, title, text }, index) => (
-          <li key={title}>
-            <div>
-              <span className="step-icon">
-                <Icon size={20} />
-              </span>
-              <div>
-                <strong>{title}</strong>
-                <small>{text}</small>
-              </div>
-            </div>
-            {index < 3 && (
-              <ChevronRight
-                className="workflow-arrow"
-                size={17}
-                aria-hidden="true"
-              />
+        {workflowSteps.map((step, index) => (
+          <li key={step.title}>
+            <span className="step-number" aria-hidden="true">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <h3>{step.title}</h3>
+            <p>{step.text}</p>
+            {step.link ? (
+              <Link className="text-link" to={step.link.to}>
+                {step.link.label}
+                <ArrowRight size={15} />
+              </Link>
+            ) : (
+              <span className="step-aside">{step.aside}</span>
             )}
           </li>
         ))}
       </ol>
+      <section className="home-evidence" aria-labelledby="evidence-heading">
+        <div>
+          <span className="eyebrow">What a result means</span>
+          <h2 id="evidence-heading">
+            Three measurements, never blended into one score.
+          </h2>
+          <p>
+            A result says verified only when an authenticated watermark is
+            recovered and matches a trace in your workspace. Looking similar is
+            not enough.
+          </p>
+          <dl className="measure-list">
+            <div>
+              <dt>Watermark</dt>
+              <dd>128-bit identifier, error-corrected, HMAC-checked</dd>
+            </div>
+            <div>
+              <dt>Exact hash</dt>
+              <dd>SHA-256 against the protected copy or its source</dd>
+            </div>
+            <div>
+              <dt>Visual similarity</dt>
+              <dd>Perceptual hash and ORB/RANSAC feature matches</dd>
+            </div>
+          </dl>
+        </div>
+        <figure className="specimen" aria-label="Example report layout">
+          <div className="specimen-head">
+            <span>TRACEMARK / REPORT</span>
+            <span>SPECIMEN</span>
+          </div>
+          <div className="specimen-verdict">Verified</div>
+          <div className="specimen-sub">
+            Watermark recovered and linked to this copy.
+          </div>
+          <dl>
+            <div>
+              <dt>identifier</dt>
+              <dd>9b074ca7-9663-4ff9…</dd>
+            </div>
+            <div>
+              <dt>reference</dt>
+              <dd>Portfolio review</dd>
+            </div>
+            <div>
+              <dt>watermark</dt>
+              <dd>integrity verified</dd>
+            </div>
+            <div>
+              <dt>sha-256</dt>
+              <dd>protected copy matches</dd>
+            </div>
+            <div>
+              <dt>phash distance</dt>
+              <dd>4 / 64 bits</dd>
+            </div>
+          </dl>
+          <span className="specimen-stamp">TRACE RESOLVED</span>
+          <figcaption className="specimen-foot">
+            Evidence of a protected copy. Not proof of legal ownership or of who
+            shared the file.
+          </figcaption>
+        </figure>
+      </section>
       <section className="sample-callout">
         <img
-          src="/sample.png"
+          src="/sample-thumb.webp"
           alt="Included geometric sample image"
-          width="160"
-          height="112"
+          width="150"
+          height="100"
+          loading="lazy"
         />
         <div>
-          <span className="eyebrow">A real working demo</span>
-          <h2>Try it with a sample image</h2>
+          <h2>Try it with the sample image</h2>
           <p>
-            Protect the sample, download it, then verify the copy. Every check
-            uses the real engine.
+            Protect it, download it, verify the copy. Same engine, nothing
+            simulated.
           </p>
-          <Link to="/protect?sample=1" className="text-link">
-            Use sample image
-            <ArrowRight size={16} />
-          </Link>
         </div>
+        <Link to="/protect?sample=1" className="button secondary">
+          Use sample image
+          <ArrowRight size={16} />
+        </Link>
       </section>
       <p className="home-note">
         <Info size={16} />A traceable identifier is evidence of a protected
-        copy. It does not prove legal ownership or who shared it.
+        copy. It does not prove legal ownership or who shared it, and TraceMark
+        does not search the web for copies.
       </p>
     </div>
   );
@@ -388,7 +479,7 @@ export function ProtectPage() {
   };
   return (
     <>
-      <PageHeading step="01 / Protect" title="Protect an image">
+      <PageHeading step="01 — Protect" title="Protect an image">
         Embed an invisible identifier and download a traceable copy.
       </PageHeading>
       <div className="journey-grid">
@@ -456,6 +547,7 @@ export function ProtectPage() {
                 Save your copy now. The private trace expires{" "}
                 {date(result.trace_expires_at)}.
               </p>
+              <FindCopies />
               <button
                 className="text-link"
                 onClick={() => {
@@ -515,32 +607,21 @@ export function ProtectPage() {
           <ErrorNotice message={error} />
         </section>
         <aside className="journey-aside">
-          <span className="aside-icon">
-            <Fingerprint size={24} />
-          </span>
           <h2>A trace you can check later</h2>
           <p>
             TraceMark places an authenticated, opaque identifier in the image
             pixels.
           </p>
           <ul className="check-list">
-            <li>
-              <Check size={16} />
-              Invisible watermark by default
-            </li>
-            <li>
-              <Check size={16} />A separate identifier for each copy
-            </li>
-            <li>
-              <Check size={16} />
-              Lossless protected PNG download
-            </li>
+            <li>Invisible watermark by default</li>
+            <li>A separate identifier for each copy</li>
+            <li>Lossless protected PNG download</li>
           </ul>
           <div className="aside-note">
             <Info size={17} />
             <p>
-              Choose a detailed image at least 432 × 432 px. Keep its dimensions
-              intact for the most reliable recovery.
+              Choose a detailed image at least 256 px on each side. Resizing and
+              everyday compression are tolerated; cropping is not.
             </p>
           </div>
           <Link className="text-link" to="/about">
@@ -617,7 +698,9 @@ function EvidenceResult({ evidence }: { evidence: Evidence }) {
       <ul className="evidence-checks">
         <li>
           <span>Watermark authenticity</span>
-          <strong>
+          <strong
+            className={evidence.watermark.authentic ? "positive" : undefined}
+          >
             {evidence.watermark.authentic
               ? "Integrity verified"
               : evidence.watermark.integrity_state === "invalid"
@@ -627,7 +710,9 @@ function EvidenceResult({ evidence }: { evidence: Evidence }) {
         </li>
         <li>
           <span>Exact file hash</span>
-          <strong>
+          <strong
+            className={evidence.exact_hash.matched ? "positive" : undefined}
+          >
             {evidence.exact_hash.matched
               ? evidence.exact_hash.kind === "protected_copy"
                 ? "Protected copy matches"
@@ -637,7 +722,7 @@ function EvidenceResult({ evidence }: { evidence: Evidence }) {
         </li>
         <li>
           <span>Visual similarity</span>
-          <strong>
+          <strong className={evidence.visual?.similar ? "positive" : undefined}>
             {evidence.visual
               ? evidence.visual.similar
                 ? "Similar private reference"
@@ -658,6 +743,12 @@ function EvidenceResult({ evidence }: { evidence: Evidence }) {
             <dt>Submitted filename</dt>
             <dd>{evidence.file.filename}</dd>
           </div>
+          {evidence.source_url && (
+            <div>
+              <dt>Found at</dt>
+              <dd className="monospace">{evidence.source_url}</dd>
+            </div>
+          )}
           <div>
             <dt>Image details</dt>
             <dd>
@@ -791,7 +882,7 @@ export function VerifyPage() {
   }, [location.state, run]);
   return (
     <>
-      <PageHeading step="02 / Verify" title="Verify an image">
+      <PageHeading step="02 — Verify" title="Verify an image">
         Recover its identifier and review the evidence behind the result.
       </PageHeading>
       <div className="journey-grid">
@@ -825,12 +916,19 @@ export function VerifyPage() {
               </button>
             )}
           </section>
+          <LinkCheckPanel
+            disabled={busy}
+            onStart={() => {
+              requestId.current += 1;
+              setFile(null);
+              setEvidence(null);
+              setError(null);
+            }}
+            onEvidence={setEvidence}
+          />
           {evidence && <EvidenceResult evidence={evidence} />}
         </div>
         <aside className="journey-aside">
-          <span className="aside-icon">
-            <ShieldCheck size={24} />
-          </span>
           <h2>Evidence behind every result</h2>
           <p>Checks run automatically when you select an image.</p>
           <ol className="check-sequence">
@@ -869,6 +967,7 @@ export function VerifyPage() {
             Protect an image first
             <ArrowRight size={15} />
           </Link>
+          <FindCopies />
         </aside>
       </div>
       <PrivacyNote limits={limits} />
@@ -913,9 +1012,10 @@ export function AboutPage() {
         <h2>How the protection works</h2>
         <p>
           A classical wavelet and cosine transform watermark places a random
-          128-bit identifier in the image. Error correction helps recovery; an
-          HMAC verifies authenticity. Recipient and reference labels stay in the
-          private registry.
+          128-bit identifier in the image. It is embedded on a fixed internal
+          grid, so a resized copy can still be read. Error correction helps
+          recovery; an HMAC verifies authenticity. Recipient and reference
+          labels stay in the private registry.
         </p>
         <p>
           Verification also checks exact SHA-256 hashes, perceptual fingerprints
@@ -931,10 +1031,11 @@ export function AboutPage() {
           ownership, who shared the file, or a recipient's intent.
         </p>
         <p>
-          Resizing, cropping, repainting, heavy compression and deliberate
-          removal can break recovery. Keep the protected PNG and its dimensions
-          intact. The project claims no universal robustness or aggregate
-          confidence score.
+          Resizing and everyday JPEG compression are tolerated within the tested
+          bounds. Cropping, repainting, heavy compression and deliberate removal
+          can still break recovery, and social platforms may apply all of them.
+          The project claims no universal robustness or aggregate confidence
+          score.
         </p>
       </section>
       <section id="privacy">
@@ -955,8 +1056,11 @@ export function AboutPage() {
         <p>
           Images are never served from public storage. Upload limits, exact CORS
           origins, CSRF checks, rate limits and private lookups protect the core
-          workflow. This application does not crawl or scan websites.
+          workflow. TraceMark never crawls the web: a link check fetches only
+          the link you submit and up to eight images on that page, from public
+          addresses only.
         </p>
+        <TraceBackup />
         <div className="clear-traces">
           {cleared ? (
             <p className="clear-success" role="status">

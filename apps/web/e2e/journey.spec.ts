@@ -178,3 +178,48 @@ test("invalid, oversized, corrupt, unmarked and unavailable backend states are h
     page.getByRole("heading", { name: "VERIFIED", exact: true }),
   ).toHaveCount(0);
 });
+
+test("link checks refuse private addresses and trace records round-trip", async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(120_000);
+  await page.goto("/verify");
+  await page
+    .getByLabel("Image or page link")
+    .fill("http://127.0.0.1/private.png");
+  await page.getByRole("button", { name: "Check link" }).click();
+  await expect(page.getByRole("alert")).toContainText("non-public");
+  await expect(
+    page.getByRole("link", { name: "TinEye" }).first(),
+  ).toHaveAttribute("rel", "noopener noreferrer");
+  await checkAccessibility(page);
+
+  await page.goto("/protect?sample=1");
+  await expect(
+    page.getByText("tracemark-sample.png", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Protect image", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Image protected" }),
+  ).toBeVisible({ timeout: 45_000 });
+
+  await page.goto("/about");
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Save trace records" }).click();
+  const download = await downloadPromise;
+  const records = testInfo.outputPath("trace-records.json");
+  await download.saveAs(records);
+  const exported = JSON.parse(await readFile(records, "utf8")) as {
+    kind: string;
+    traces: unknown[];
+  };
+  expect(exported.kind).toBe("tracemark-trace-export");
+  expect(exported.traces.length).toBeGreaterThan(0);
+  await page
+    .getByLabel("Restore trace records from file")
+    .setInputFiles(records);
+  await expect(page.getByRole("status")).toContainText("already here");
+  await checkAccessibility(page);
+});

@@ -69,6 +69,7 @@ def pdf(snapshot: dict[str, Any]) -> bytes:
         ("Reference / recipient", snapshot["reference_label"] or "None"),
         ("Source file", snapshot["source_filename"] or "No private source resolved"),
         ("Submitted file", file["filename"]),
+        *([("Found at", snapshot["source_url"])] if snapshot.get("source_url") else []),
         ("Image", f"{file['width']} x {file['height']} pixels; {file['media_type']}; {file['size_bytes']} bytes"),
         ("SHA-256", file["sha256"]),
         ("Watermark integrity", watermark["integrity_state"].replace("_", " ")),

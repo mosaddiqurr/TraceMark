@@ -67,4 +67,24 @@ export interface Evidence {
   provenance: { state: string; detail?: string };
   limitations: string[];
   report: { download_url: string; expires_at: string };
+  source_url?: string;
+}
+export interface LinkCheckImage {
+  url: string;
+  status: "verified" | "checked" | "error";
+  classification?: string;
+  reference_label?: string | null;
+  identifier?: string | null;
+  message?: string;
+}
+export interface LinkCheck {
+  source_url: string;
+  kind: "image" | "page";
+  images: LinkCheckImage[];
+  truncated: boolean;
+  evidence: Evidence | null;
+}
+export interface TraceImport {
+  imported: number;
+  skipped: number;
 }
