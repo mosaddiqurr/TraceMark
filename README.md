@@ -1,7 +1,10 @@
 # TraceMark
 
 <p align="center">
-  <img src="apps/web/public/brand/tracemark-logo.png" alt="TraceMark" width="380" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/tracemark-wordmark-dark.png" />
+    <img src="docs/brand/tracemark-wordmark-light.png" alt="TraceMark: keep the trace." width="440" />
+  </picture>
 </p>
 
 **Protect images with traceable identifiers and verify their provenance later.**
