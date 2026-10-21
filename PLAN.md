@@ -1,6 +1,6 @@
 # TraceMark implementation plan
 
-Updated: 2026-10-22. Redesign, resize-tolerant watermark, link checks and trace backup complete and validated locally; not yet committed or deployed.
+Updated: 2026-10-22. Redesign, resize-tolerant watermark, link checks and trace backup complete and validated and merged to main; not yet deployed.
 
 | Milestone | State | Evidence |
 |---|---|---|
@@ -15,6 +15,7 @@ Updated: 2026-10-22. Redesign, resize-tolerant watermark, link checks and trace 
 | Link checks and search guidance | Complete | SSRF-safe image/page checks, reverse image search links (D023) |
 | Signed trace backup and restore | Complete | HMAC export/import, tamper rejection, moving restore (D024) |
 | Dependency advisories | Complete | Pillow 13.0.0 and Vite 6.4.4; pip-audit and pnpm audit clean |
-| Commit, push and redeploy | Pending owner approval | Changes are local only |
+| Commit and publish | Complete | Merged to main through pull request #1 |
+| Host a live demo | Pending | Needs a Python host with persistent storage; see docs/DEPLOYMENT.md |
 
 Public hosting requires a persistent private directory, stable secrets, exact HTTPS origins, secure cookies and one API instance. Crop-tolerant synchronization, C2PA signing (needs a trusted certificate) and paid reverse-search API integration are future work.

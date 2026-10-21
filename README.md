@@ -4,15 +4,11 @@
   <img src="apps/web/public/brand/tracemark-logo.png" alt="TraceMark" width="380" />
 </p>
 
-<p align="center">
-  <a href="LIVE_DEMO_URL"><img src="https://img.shields.io/badge/Live_Demo-Open_TraceMark-102b48?style=for-the-badge" alt="Open TraceMark live demo" /></a>
-</p>
-
 **Protect images with traceable identifiers and verify their provenance later.**
 
 ## Overview
 
-Download the protected copy, upload it later, and inspect the evidence behind its provenance result. The live demo link is a publication placeholder; replace `LIVE_DEMO_URL` when a hosted instance is available.
+Download the protected copy, upload it later, and inspect the evidence behind its provenance result. A hosted demo is not available yet; run it locally with the setup below.
 
 TraceMark is a focused security portfolio project. Its checks use a real classical watermark engine. A recovered identifier does not prove legal ownership, authorship, recipient intent or who shared a file.
 
