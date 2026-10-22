@@ -33,6 +33,7 @@ lint:
 	$(PNPM) --dir apps/web format:check
 
 test:
+	$(PYTHON) -c "from pathlib import Path; Path('.tmp-tests').mkdir(exist_ok=True)"
 	$(PYTHON) -m pytest --basetemp=$(TEST_TMP_DIR) -o cache_dir=$(TEST_CACHE_DIR) --cov=apps/api/tracemark_api --cov=packages/watermark_engine/src/tracemark_watermark --cov-report=term-missing --cov-fail-under=75
 	$(PNPM) --dir apps/web test
 
