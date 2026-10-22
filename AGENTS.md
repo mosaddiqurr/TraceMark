@@ -6,9 +6,9 @@ Build and maintain TraceMark as an honest, secure still-image forensic watermark
 
 ## Working rules
 
-- Read `SPECIFICATION.md`, `PLAN.md`, `STATUS.md`, `DECISIONS.md`, and `THREAT_MODEL.md` before substantial work.
-- Update `PLAN.md` and `STATUS.md` after every substantial milestone.
-- Record architectural or security tradeoffs in `DECISIONS.md` and technical shortfalls in `LIMITATIONS.md`.
+- Read `README.md`, `docs/ARCHITECTURE.md`, `docs/DECISIONS.md` and `docs/THREAT_MODEL.md` before substantial work.
+- Update the measured results in `docs/EVALUATION.md` from captured output after every substantial milestone.
+- Record architectural or security tradeoffs in `docs/DECISIONS.md` and technical shortfalls in `docs/LIMITATIONS.md`.
 - Preserve user isolation on every object lookup and download.
 - Never log image bytes, credentials, session values, watermark keys, or report-authentication keys.
 - Do not embed recipient labels or personal information in images; use opaque tokens only.

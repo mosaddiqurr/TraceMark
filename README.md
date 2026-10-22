@@ -1,7 +1,10 @@
 # TraceMark
 
 <p align="center">
-  <img src="apps/web/public/brand/tracemark-logo.png" alt="TraceMark" width="380" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/tracemark-wordmark-dark.png" />
+    <img src="docs/brand/tracemark-wordmark-light.png" alt="TraceMark: keep the trace." width="440" />
+  </picture>
 </p>
 
 **Protect images with traceable identifiers and verify their provenance later.**
@@ -115,7 +118,7 @@ Inputs are limited to 20 MiB, 4 million pixels and 4096 px per side. Animation a
 
 Multipart parsing may spool a large upload temporarily, and optional provenance inspection uses a temporary file. These are closed or removed after processing; no permanent image store is created. Bound temporary storage and CPU/memory at the Python host.
 
-See [Security](SECURITY.md) and [Threat model](THREAT_MODEL.md).
+See [Security](SECURITY.md) and [Threat model](docs/THREAT_MODEL.md).
 
 ## Supported formats and limitations
 
@@ -133,7 +136,7 @@ Quick benchmark (four deterministic synthetic fixtures, `docs/benchmark-quick.js
 | Center crop 5% | **0/4** | 0/4 |
 | Unmarked controls accepted | 0 | 0 |
 
-Cropping still defeats extraction, as do rotation, distortion, repainting, very heavy recompression and deliberate removal; social platforms often crop. v3 trades some invisibility for robustness (about 39–40 dB PSNR); faint grain can be visible in large flat dark areas on close inspection. The benchmark is reproducible evidence on synthetic fixtures, not a universal robustness claim. Optional C2PA unavailability does not invalidate independent pixel evidence. See [Watermark method](docs/WATERMARK_ALGORITHM.md) and [Limitations](LIMITATIONS.md).
+Cropping still defeats extraction, as do rotation, distortion, repainting, very heavy recompression and deliberate removal; social platforms often crop. v3 trades some invisibility for robustness (about 39–40 dB PSNR); faint grain can be visible in large flat dark areas on close inspection. The benchmark is reproducible evidence on synthetic fixtures, not a universal robustness claim. Optional C2PA unavailability does not invalidate independent pixel evidence. See [Watermark method](docs/WATERMARK_ALGORITHM.md) and [Limitations](docs/LIMITATIONS.md).
 
 ## Finding and checking copies
 
@@ -163,7 +166,7 @@ python -m bandit -r apps/api/tracemark_api packages/watermark_engine/src scripts
 
 PowerShell equivalents: `scripts/lint.ps1`, `scripts/test.ps1`, `scripts/benchmark.ps1`, `scripts/restart.ps1`. Browser tests build and serve the production frontend with a direct URL to a real isolated API and verify downloads/re-uploads/reports at 1440, 1366, 768 and 390 px. CLI benchmarks retain the robust and LSB engines plus negative controls.
 
-Current measured results and any unavailable gates are recorded in [STATUS.md](STATUS.md). The restart check validates a cold native process restart, retained private mappings and expired temporary links.
+Current measured results are recorded in [Evaluation](docs/EVALUATION.md). The restart check validates a cold native process restart, retained private mappings and expired temporary links.
 
 ## Repository
 
@@ -172,7 +175,17 @@ Current measured results and any unavailable gates are recorded in [STATUS.md](S
 - `packages/watermark_engine`: reused independent watermark/forensic primitives.
 - `tests`: meaningful algorithm, API and security regression coverage.
 - `assets`: supplied TraceMark logo.
-- `scripts`, `docs`: reproducible setup, deployment, evaluation and guides.
+- `scripts`: reproducible setup, test, benchmark and restart commands.
+- `docs`: the guides below, screenshots and the benchmark snapshot.
+
+## Documentation
+
+- [User guide](docs/USER_GUIDE.md): using the app, plus a demonstration walkthrough.
+- [Architecture](docs/ARCHITECTURE.md): components, data model and API.
+- [Watermark method](docs/WATERMARK_ALGORITHM.md) and [Evaluation](docs/EVALUATION.md): how marks are embedded and measured, with the latest results.
+- [Deployment](docs/DEPLOYMENT.md): hosting the frontend and API.
+- [Threat model](docs/THREAT_MODEL.md), [Limitations](docs/LIMITATIONS.md) and [Design decisions](docs/DECISIONS.md).
+- [Security policy](SECURITY.md).
 
 ## Credits
 

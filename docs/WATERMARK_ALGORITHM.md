@@ -36,4 +36,4 @@ The retained measurements include PSNR, windowed SSIM, absolute/RMS error, chang
 
 The quick benchmark (four fixtures) recovers v3 at 4/4 for clean, JPEG-85, 75% resize, 50% resize + JPEG-80, 150% upscale and WebP-80, and 0/4 for a 5% center crop. v2 recovers clean and JPEG-85 only; LSB recovers clean only. No engine accepted an unmarked control; four controls cannot establish a population false-positive rate.
 
-See [Evaluation](../EVALUATION.md), [Benchmark guide](BENCHMARK_GUIDE.md) and [Limitations](../LIMITATIONS.md).
+See [Evaluation](EVALUATION.md) and [Limitations](LIMITATIONS.md).
