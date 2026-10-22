@@ -12,4 +12,4 @@ Trace metadata is sensitive: visual descriptors can reveal aspects of source ima
 
 Keep keys stable across deployments to preserve watermark authentication and private cookie resolution. This release supports key version 1 only; key rotation and migration require a separate design. Report HMACs authenticate snapshots to the deployment's secret, not to a public trust authority.
 
-See [Deployment](docs/DEPLOYMENT.md), [Threat model](THREAT_MODEL.md) and [Limitations](LIMITATIONS.md).
+See [Deployment](docs/DEPLOYMENT.md), [Threat model](docs/THREAT_MODEL.md) and [Limitations](docs/LIMITATIONS.md).
