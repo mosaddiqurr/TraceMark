@@ -99,6 +99,10 @@ test("real image journey: protect, download, re-upload, evidence and reports", a
     page.getByRole("heading", { name: "VERIFIED", exact: true }),
   ).toHaveCount(0);
   await page.getByRole("link", { name: "Protect", exact: true }).click();
+  // Verify has its own picker; wait for Protect's before choosing a file.
+  await expect(
+    page.getByRole("heading", { name: "Protect an image", level: 1 }),
+  ).toBeVisible();
   await page.getByLabel("Choose image").setInputFiles(filename);
   await page
     .getByRole("button", { name: "Protect image", exact: true })
